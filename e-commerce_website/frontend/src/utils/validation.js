@@ -43,12 +43,28 @@ export function validateEthiopianPhone(value) {
   return null;
 }
 
+const ADDIS_ABABA_SUB_CITIES = [
+  "bole", "akaki kality", "arada", "gullele", "kirkos",
+  "kolfe keranio", "lideta", "nifas silk", "lemi kura", "yeka", "addis ketema"
+];
+
+const ADDIS_ABABA_NEIGHBORHOODS = [
+  "goro", "figa", "gerji", "megenagna", "saris", "cmc", "ayat", "kotebe",
+  "22", "4 kilo", "5 kilo", "6 kilo", "piassa", "merkato", "sar bet",
+  "old airport", "jackros", "salite mehret", "legetafo", "jemo", "lebu", "mexico"
+];
+
 export function validateAddressAddisAbaba(value) {
-  const v = (value || "").trim();
+  const v = (value || "").trim().toLowerCase();
   if (!v) return "Address is required.";
-  const lower = v.toLowerCase();
-  if (!lower.includes("addis ababa") && !lower.includes("addisababa")) {
-    return "Address must be in Addis Ababa, Ethiopia.";
+
+  const isAddisAbaba = v.includes("addis ababa") || v.includes("addisababa");
+  const isSubCity = ADDIS_ABABA_SUB_CITIES.some(sub => v.includes(sub));
+  const isNeighborhood = ADDIS_ABABA_NEIGHBORHOODS.some(n => v.includes(n));
+  const isWoreda = v.includes("woreda");
+
+  if (!isAddisAbaba && !isSubCity && !isNeighborhood && !isWoreda) {
+    return "Address must be in Addis Ababa (include sub-city, neighborhood like Goro/Bole, or Woreda).";
   }
   return null;
 }

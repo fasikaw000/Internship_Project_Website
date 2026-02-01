@@ -45,7 +45,7 @@ export default function Register() {
   };
 
   return (
-    <form onSubmit={submitHandler} className="p-6 max-w-md mx-auto">
+    <form onSubmit={submitHandler} className="p-6 max-w-md mx-auto animate-fadeIn">
       {Object.keys(form).map((key) => {
         if (key === "password") {
           return (

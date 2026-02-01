@@ -17,7 +17,7 @@ export default function ManageProducts() {
   const [loading, setLoading] = useState(false);
   const imageInputRef = useRef(null);
 
-  const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace("/api", "");
+  const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5001/api").replace("/api", "");
 
   const loadProducts = async () => {
     const res = await api.get("/products");
@@ -183,8 +183,11 @@ export default function ManageProducts() {
                   <div className="h-12 w-12 rounded bg-gray-200 flex items-center justify-center text-gray-400 text-xs">No img</div>
                 )}
                 <div>
-                  <span className="font-medium">{p.name}</span>
-                  <span className="text-gray-500 text-sm ml-2">{p.price?.toFixed(2)} ETB · {p.category}</span>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{p.name}</span>
+                    <span className="text-[10px] text-gray-400 font-medium">Added: {new Date(p.createdAt).toLocaleString()}</span>
+                  </div>
+                  <span className="text-gray-500 text-sm">{p.price?.toFixed(2)} ETB · {p.category}</span>
                 </div>
               </div>
               <button

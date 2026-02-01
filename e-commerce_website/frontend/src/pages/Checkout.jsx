@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { placeOrder, getBankInfo } from "../services/orderService";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../hooks/useAuth";
 import {
   validateFullName,
   validateEmail,
@@ -11,12 +12,13 @@ import {
 
 export default function Checkout() {
   const { cart, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [bank, setBank] = useState({ fullName: "", accountNumber: "" });
   const [form, setForm] = useState({
-    name: "",
+    name: user?.fullName || "",
     phone: "",
-    email: "",
+    email: user?.email || "",
     address: "",
   });
   const [receipt, setReceipt] = useState(null);
@@ -25,6 +27,16 @@ export default function Checkout() {
   useEffect(() => {
     getBankInfo().then(setBank).catch(() => { });
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        email: user.email,
+        name: user.fullName || prev.name,
+      }));
+    }
+  }, [user]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -74,7 +86,7 @@ export default function Checkout() {
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto">
+    <div className="p-6 max-w-lg mx-auto animate-fadeIn">
       <h2 className="text-2xl font-bold mb-4">Checkout</h2>
 
       {/* Admin CBE account - visible for payment */}
@@ -101,10 +113,12 @@ export default function Checkout() {
         />
         <input
           type="email"
-          className="border border-gray-300 w-full p-2 rounded"
+          className={`border border-gray-300 w-full p-2 rounded ${user ? "bg-gray-100 text-gray-500 cursor-not-allowed" : ""}`}
           placeholder="Email"
           value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          readOnly={!!user}
+          onChange={(e) => !user && setForm({ ...form, email: e.target.value })}
+          title={user ? "Email must match your login email" : ""}
           required
         />
         <input

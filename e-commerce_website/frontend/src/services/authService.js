@@ -10,13 +10,13 @@ export const registerUser = async (data) => {
 export const loginUser = async (data) => {
   const res = await api.post("/auth/login", data);
 
-  // Save token locally
-  localStorage.setItem("token", res.data.token);
+  // Save token locally in session (isolates tabs)
+  sessionStorage.setItem("token", res.data.token);
 
   return res.data;
 };
 
 // Logout user
 export const logoutUser = () => {
-  localStorage.removeItem("token");
+  sessionStorage.removeItem("token");
 };

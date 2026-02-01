@@ -29,3 +29,9 @@ export const loginUser = asyncHandler(async (req, res) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
   res.json({ token, user: { id: user._id, fullName: user.fullName, role: user.role } });
 });
+
+// Get current user profile
+export const getMe = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select("-password");
+  res.json({ id: user._id, fullName: user.fullName, role: user.role, email: user.email });
+});

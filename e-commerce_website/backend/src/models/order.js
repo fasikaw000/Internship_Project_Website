@@ -16,7 +16,7 @@ const orderSchema = new mongoose.Schema({
     address: String,
   },
   receiptImage: { type: String }, // uploaded by user
-  status: { type: String, enum: ["pending", "completed"], default: "pending" },
+  status: { type: String, enum: ["pending", "verified", "delivered", "cancelled"], default: "pending" },
   createdAt: { type: Date, default: Date.now },
 });
 

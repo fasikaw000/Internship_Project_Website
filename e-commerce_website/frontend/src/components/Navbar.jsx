@@ -1,8 +1,8 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useCart } from "../context/CartContext";
-import logoSvg from "../assets/logo.svg";
+import logoPng from "../assets/logo_unique.png";
 
 const navClass = ({ isActive }) =>
   `font-medium transition ${isActive ? "text-white font-semibold underline underline-offset-4" : "text-teal-100 hover:text-white"}`;
@@ -10,24 +10,36 @@ const navClass = ({ isActive }) =>
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
   const { clearCart } = useCart();
-  const [logoSrc, setLogoSrc] = useState(logoSvg);
-
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => setLogoSrc("/logo.png");
-    img.onerror = () => { };
-    img.src = "/logo.png";
-  }, []);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     clearCart();
     logout();
+    navigate("/login");
   };
 
   return (
     <nav className="bg-slate-900 border-b border-slate-800 px-6 py-3.5 flex items-center justify-between shadow-md">
-      <Link to="/" className="flex items-center shrink-0">
-        <img src={logoSrc} alt="Logo" className="h-10 object-contain max-w-[140px] brightness-0 invert" />
+      <Link to="/" className="flex items-center gap-2 group">
+        <div className="bg-teal-500 p-1.5 rounded-lg shadow-lg group-hover:scale-110 transition duration-300">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+            />
+          </svg>
+        </div>
+        <span className="text-xl font-black text-white tracking-tighter uppercase">
+          MICHU-<span className="text-teal-400">GEBEYA</span>
+        </span>
       </Link>
 
       <div className="flex gap-7 items-center">
@@ -36,6 +48,7 @@ export default function Navbar() {
         <NavLink to="/contact" className={navClass}>Contact Us</NavLink>
         <NavLink to="/about" className={navClass}>About Us</NavLink>
         {user && <NavLink to="/cart" className={navClass}>Cart</NavLink>}
+        {user && <NavLink to="/orders" className={navClass}>My Orders</NavLink>}
         {isAdmin && <NavLink to="/admin" className={navClass}>Admin</NavLink>}
       </div>
 

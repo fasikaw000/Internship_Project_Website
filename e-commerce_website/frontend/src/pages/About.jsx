@@ -1,6 +1,6 @@
 export default function About() {
   return (
-    <div>
+    <div className="animate-fadeIn">
       <div className="bg-white">
         <div className="max-w-4xl mx-auto px-6 py-12 md:py-16">
           {/* Who We Are */}
@@ -17,7 +17,7 @@ export default function About() {
 
           {/* Mission & Vision grid */}
           <div className="grid md:grid-cols-2 gap-8 mt-12">
-            <section className="bg-gray-50 rounded-xl p-6 md:p-8 border border-gray-100 shadow-sm">
+            <section className="bg-gray-50 rounded-xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
               <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -29,7 +29,7 @@ export default function About() {
               </p>
             </section>
 
-            <section className="bg-gray-50 rounded-xl p-6 md:p-8 border border-gray-100 shadow-sm">
+            <section className="bg-gray-50 rounded-xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300">
               <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

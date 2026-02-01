@@ -31,11 +31,14 @@ export default function ManageComments() {
       ) : (
         comments.map((c) => (
           <div key={c._id} className="border border-gray-200 rounded-lg p-4 mb-3 bg-white shadow-sm">
-            <p className="text-gray-700">
-              <strong>{c.user?.fullName ?? c.name ?? "Guest"}</strong>
-              {c.user?.email && <span className="text-gray-500 text-sm ml-2">({c.user.email})</span>}
-              : {c.message}
-            </p>
+            <div className="flex justify-between items-start mb-2">
+              <p className="text-gray-700">
+                <strong>{c.user?.fullName ?? c.name ?? "Guest"}</strong>
+                {c.user?.email && <span className="text-gray-500 text-sm ml-2">({c.user.email})</span>}
+              </p>
+              <span className="text-xs text-gray-400">{new Date(c.createdAt).toLocaleString()}</span>
+            </div>
+            <p className="text-gray-600 italic">"{c.message}"</p>
             {c.adminReply && <p className="mt-2 text-sm text-indigo-600">Reply: {c.adminReply}</p>}
             <button
               onClick={() => deleteComment(c._id)}

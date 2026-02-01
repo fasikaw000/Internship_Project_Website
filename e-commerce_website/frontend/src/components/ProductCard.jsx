@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../hooks/useAuth";
 
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace("/api", "");
+const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5001/api").replace("/api", "");
 
 export default function ProductCard({ product }) {
   const { user } = useAuth();
@@ -24,10 +24,11 @@ export default function ProductCard({ product }) {
   };
 
   return (
-    <div className="border border-gray-200 rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow flex flex-col bg-white h-full">
-      <div className="aspect-square w-full bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center">
+    <div className="border border-gray-200 rounded-xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col bg-white h-full animate-scaleIn hover:-translate-y-2 group">
+      <div className="aspect-square w-full bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center relative">
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
         {imageSrc ? (
-          <img src={imageSrc} alt={product.name} className="w-full h-full object-contain" />
+          <img src={imageSrc} alt={product.name} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110" />
         ) : (
           <span className="text-gray-500 text-sm">No image</span>
         )}

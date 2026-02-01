@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/authRoutes.js";
@@ -28,6 +29,18 @@ app.use(express.json()); // Parse JSON requests
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Ensure upload directories exist
+const uploadDirs = [
+  path.join(__dirname, "src/uploads/receipts"),
+  path.join(__dirname, "src/uploads/products"),
+];
+
+uploadDirs.forEach((dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    console.log(`Created directory: ${dir}`);
+  }
+});
 // Serve uploaded receipts and product images
 app.use("/uploads/receipts", express.static(path.join(__dirname, "src/uploads/receipts")));
 app.use("/uploads/products", express.static(path.join(__dirname, "src/uploads/products")));

@@ -1,9 +1,15 @@
 import multer from "multer";
 import path from "path";
+import fs from "fs";
+
+const receiptUploadDir = "src/uploads/receipts";
+if (!fs.existsSync(receiptUploadDir)) {
+  fs.mkdirSync(receiptUploadDir, { recursive: true });
+}
 
 // Storage settings
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "src/uploads/receipts"),
+  destination: (req, file, cb) => cb(null, receiptUploadDir),
   filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
 });
 

@@ -31,7 +31,7 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={submitHandler} className="p-6 max-w-md mx-auto space-y-3">
+    <form onSubmit={submitHandler} className="p-6 max-w-md mx-auto space-y-3 animate-fadeIn">
       <input
         type="email"
         className="border border-gray-300 w-full p-2 rounded"

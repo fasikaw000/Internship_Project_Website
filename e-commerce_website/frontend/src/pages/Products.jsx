@@ -36,7 +36,7 @@ export default function Products() {
   const hasMore = products.length > showCount;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 max-w-6xl mx-auto animate-fadeIn">
       <CategoryFilter
         categories={categoryOptions}
         selected={category}
