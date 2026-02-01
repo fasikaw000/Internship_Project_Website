@@ -31,24 +31,35 @@ export default function ManageProducts() {
   const addProduct = async (e) => {
     e.preventDefault();
     const price = parseFloat(form.price);
-    const stock = parseInt(form.stock, 10) || 0;
-    if (!form.name.trim()) {
-      alert("Product name is required.");
+    const stock = parseInt(form.stock, 10); // Parse strictly
+
+    if (
+      !form.name.trim() ||
+      !form.category ||
+      form.category === "all" ||
+      form.price === "" ||
+      isNaN(price) ||
+      price <= 0 ||
+      form.stock === "" ||
+      isNaN(stock) ||
+      stock < 0 ||
+      !form.description.trim() ||
+      !imageFile
+    ) {
+      alert("Please fill all fields");
       return;
     }
-    if (isNaN(price) || price < 0) {
-      alert("Enter a valid price.");
-      return;
-    }
+
     setLoading(true);
     try {
       const body = new FormData();
       body.append("name", form.name.trim());
       body.append("category", form.category);
       body.append("price", price);
-      body.append("description", form.description.trim() || "");
+      body.append("description", form.description.trim());
       body.append("stock", stock);
-      if (imageFile) body.append("image", imageFile);
+      body.append("image", imageFile);
+
       await api.post("/products", body, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -173,7 +184,7 @@ export default function ManageProducts() {
                 )}
                 <div>
                   <span className="font-medium">{p.name}</span>
-                  <span className="text-gray-500 text-sm ml-2">${p.price?.toFixed(2)} · {p.category}</span>
+                  <span className="text-gray-500 text-sm ml-2">{p.price?.toFixed(2)} ETB · {p.category}</span>
                 </div>
               </div>
               <button

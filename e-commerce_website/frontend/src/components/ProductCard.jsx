@@ -35,7 +35,7 @@ export default function ProductCard({ product }) {
 
       <h3 className="text-lg font-semibold mt-3 text-gray-900">{product.name}</h3>
       <p className="text-gray-600 text-sm line-clamp-2 flex-1 mt-1">{product.description}</p>
-      <p className="font-bold mt-2 text-indigo-600">${Number(product.price).toFixed(2)}</p>
+      <p className="font-bold mt-2 text-indigo-600">{Number(product.price).toFixed(2)} ETB</p>
 
       {user && (
         <div className="flex items-center mt-3 gap-1">

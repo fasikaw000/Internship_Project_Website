@@ -38,7 +38,7 @@ export default function Orders() {
                   {o.status === "completed" ? "Transaction completed" : o.status}
                 </span>
               </div>
-              <p className="font-medium">Total: ${o.totalPrice?.toFixed(2)}</p>
+              <p className="font-medium">Total: {o.totalPrice?.toFixed(2)} ETB</p>
               {o.deliveryInfo && (
                 <p className="text-sm text-gray-600">
                   {o.deliveryInfo.name}, {o.deliveryInfo.address}

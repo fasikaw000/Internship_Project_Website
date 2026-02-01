@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { sendComment } from "../services/commentService";
+import { validateName, validateEmail, validateMessage } from "../utils/validation";
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -11,13 +12,20 @@ export default function Contact() {
       email: form.email.trim(),
       message: form.message.trim(),
     };
-    if (!trimmed.name || !trimmed.email || !trimmed.message) {
-      alert("Please fill in all fields (name, email, and message).");
+    const errors = [];
+    const nameErr = validateName(trimmed.name);
+    if (nameErr) errors.push(nameErr);
+    const emailErr = validateEmail(trimmed.email);
+    if (emailErr) errors.push(emailErr);
+    const messageErr = validateMessage(trimmed.message);
+    if (messageErr) errors.push(messageErr);
+    if (errors.length > 0) {
+      alert("Please correct the following:\n\n• " + errors.join("\n• "));
       return;
     }
     try {
       await sendComment(trimmed);
-      alert("Thank you, message is sent");
+      alert("Comments are sent");
       setForm({ name: "", email: "", message: "" });
     } catch (err) {
       alert("Failed to send message. Please try again.");
@@ -57,6 +65,7 @@ export default function Contact() {
               placeholder="Your name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
             />
           </div>
           <div>
@@ -67,6 +76,7 @@ export default function Contact() {
               placeholder="Your email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
+              required
             />
           </div>
           <div>
@@ -76,6 +86,7 @@ export default function Contact() {
               placeholder="Your message"
               value={form.message}
               onChange={(e) => setForm({ ...form, message: e.target.value })}
+              required
             />
           </div>
           <button type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded font-medium">

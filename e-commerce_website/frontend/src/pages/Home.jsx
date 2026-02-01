@@ -16,7 +16,7 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">
             Welcome to Our E-Commerce Store
           </h1>
-          <p className="mb-6 text-lg text-gray-800 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">
+          <p className="mb-6 text-lg text-white font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             We are your one-stop shop for Electronics, Fashion, Books and more. Browse four categories and order with ease.
           </p>
           <Link

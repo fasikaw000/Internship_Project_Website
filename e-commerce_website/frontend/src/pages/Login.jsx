@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { validateEmail, validatePassword } from "../utils/validation";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -11,11 +12,20 @@ export default function Login() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    const errors = [];
+    const emailErr = validateEmail(email);
+    if (emailErr) errors.push(emailErr);
+    const passwordErr = validatePassword(password);
+    if (passwordErr) errors.push(passwordErr);
+    if (errors.length > 0) {
+      alert("Please correct the following:\n\n• " + errors.join("\n• "));
+      return;
+    }
     try {
       await login({ email, password });
       navigate("/");
     } catch (err) {
-      alert("Login failed. Please check email/password.");
+      alert("Login failed. Please check your credentials.");
       console.error(err);
     }
   };
@@ -23,19 +33,22 @@ export default function Login() {
   return (
     <form onSubmit={submitHandler} className="p-6 max-w-md mx-auto space-y-3">
       <input
-        className="border w-full p-2"
+        type="email"
+        className="border border-gray-300 w-full p-2 rounded"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        required
       />
 
       <div className="relative">
         <input
-          className="border w-full p-2 pr-10"
+          className="border border-gray-300 w-full p-2 pr-10 rounded"
           type={showPassword ? "text" : "password"}
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button
           type="button"

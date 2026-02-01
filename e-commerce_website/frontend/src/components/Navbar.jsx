@@ -5,7 +5,7 @@ import { useCart } from "../context/CartContext";
 import logoSvg from "../assets/logo.svg";
 
 const navClass = ({ isActive }) =>
-  `font-medium transition ${isActive ? "text-indigo-600 font-semibold underline underline-offset-4" : "text-gray-700 hover:text-indigo-600"}`;
+  `font-medium transition ${isActive ? "text-white font-semibold underline underline-offset-4" : "text-teal-100 hover:text-white"}`;
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
@@ -15,7 +15,7 @@ export default function Navbar() {
   useEffect(() => {
     const img = new Image();
     img.onload = () => setLogoSrc("/logo.png");
-    img.onerror = () => {};
+    img.onerror = () => { };
     img.src = "/logo.png";
   }, []);
 
@@ -25,9 +25,9 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 px-6 py-3.5 flex items-center justify-between shadow-sm">
+    <nav className="bg-slate-900 border-b border-slate-800 px-6 py-3.5 flex items-center justify-between shadow-md">
       <Link to="/" className="flex items-center shrink-0">
-        <img src={logoSrc} alt="Logo" className="h-10 object-contain max-w-[140px]" />
+        <img src={logoSrc} alt="Logo" className="h-10 object-contain max-w-[140px] brightness-0 invert" />
       </Link>
 
       <div className="flex gap-7 items-center">
@@ -43,12 +43,12 @@ export default function Navbar() {
         {!user ? (
           <>
             <NavLink to="/login" className={navClass}>Login</NavLink>
-            <Link to="/register" className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg transition">Register</Link>
+            <Link to="/register" className="bg-white hover:bg-teal-50 text-teal-700 px-3 py-1.5 rounded-lg font-medium transition">Register</Link>
           </>
         ) : (
           <>
-            <span className="text-sm text-gray-600">Welcome, {user.fullName}</span>
-            <button onClick={handleLogout} className="text-gray-700 hover:text-indigo-600 transition">Logout</button>
+            <span className="text-sm text-teal-100">Welcome, {user.fullName}</span>
+            <button onClick={handleLogout} className="text-teal-100 hover:text-white transition">Logout</button>
           </>
         )}
       </div>

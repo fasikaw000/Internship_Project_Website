@@ -33,7 +33,7 @@ function App() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
 
-      <main className="flex-1 bg-white">
+      <main className="flex-1 bg-slate-200">
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home />} />

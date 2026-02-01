@@ -32,7 +32,7 @@ export default function Cart() {
                 {cart.map((item) => (
                   <tr key={item._id} className="border-b border-gray-200 align-middle">
                     <td className="py-3">{item.name}</td>
-                    <td className="py-3 text-right">${(item.price || 0).toFixed(2)}</td>
+                    <td className="py-3 text-right">{(item.price || 0).toFixed(2)} ETB</td>
                     <td className="py-3 text-right">
                       <input
                         type="number"
@@ -42,7 +42,7 @@ export default function Cart() {
                         onChange={(e) => updateQty(item._id, e.target.value)}
                       />
                     </td>
-                    <td className="py-3 text-right font-medium">${lineTotal(item).toFixed(2)}</td>
+                    <td className="py-3 text-right font-medium">{lineTotal(item).toFixed(2)} ETB</td>
                     <td className="py-3">
                       <button type="button" onClick={() => removeFromCart(item._id)} className="text-red-600 text-sm hover:underline">
                         Remove
@@ -54,7 +54,7 @@ export default function Cart() {
             </table>
           </div>
           <div className="mt-4 flex justify-end">
-            <p className="text-lg font-bold">Total: ${grandTotal.toFixed(2)}</p>
+            <p className="text-lg font-bold">Total: {grandTotal.toFixed(2)} ETB</p>
           </div>
           <Link to="/checkout" className="inline-block mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
             Checkout

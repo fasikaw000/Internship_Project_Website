@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { placeOrder, getBankInfo } from "../services/orderService";
 import { useCart } from "../context/CartContext";
+import {
+  validateFullName,
+  validateEmail,
+  validateEthiopianPhone,
+  validateAddressAddisAbaba,
+} from "../utils/validation";
 
 export default function Checkout() {
   const { cart, clearCart } = useCart();
@@ -17,7 +23,7 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getBankInfo().then(setBank).catch(() => {});
+    getBankInfo().then(setBank).catch(() => { });
   }, []);
 
   const submitHandler = async (e) => {
@@ -32,12 +38,18 @@ export default function Checkout() {
       email: form.email.trim(),
       address: form.address.trim(),
     };
-    if (!trimmed.name || !trimmed.phone || !trimmed.email || !trimmed.address) {
-      alert("Please fill in all delivery fields: name, phone, email, and address.");
-      return;
-    }
-    if (!receipt) {
-      alert("Please upload your payment receipt (screenshot).");
+    const errors = [];
+    const nameErr = validateFullName(trimmed.name);
+    if (nameErr) errors.push(nameErr);
+    const phoneErr = validateEthiopianPhone(trimmed.phone);
+    if (phoneErr) errors.push(phoneErr);
+    const emailErr = validateEmail(trimmed.email);
+    if (emailErr) errors.push(emailErr);
+    const addressErr = validateAddressAddisAbaba(trimmed.address);
+    if (addressErr) errors.push(addressErr);
+    if (!receipt) errors.push("Payment receipt");
+    if (errors.length > 0) {
+      alert("Please complete all required fields:\n\n• " + errors.join("\n• "));
       return;
     }
     setLoading(true);
@@ -74,30 +86,30 @@ export default function Checkout() {
 
       <form onSubmit={submitHandler} className="space-y-3">
         <input
-          className="border w-full p-2"
+          className="border border-gray-300 w-full p-2 rounded"
           placeholder="Full name"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           required
         />
         <input
-          className="border w-full p-2"
-          placeholder="Phone number"
+          className="border border-gray-300 w-full p-2 rounded"
+          placeholder="Ethiopian phone (e.g. 0911123456 or +251911123456)"
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
           required
         />
         <input
-          className="border w-full p-2"
           type="email"
+          className="border border-gray-300 w-full p-2 rounded"
           placeholder="Email"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
           required
         />
         <input
-          className="border w-full p-2"
-          placeholder="Address (Addis Ababa)"
+          className="border border-gray-300 w-full p-2 rounded"
+          placeholder="Address in Addis Ababa, Ethiopia"
           value={form.address}
           onChange={(e) => setForm({ ...form, address: e.target.value })}
           required
