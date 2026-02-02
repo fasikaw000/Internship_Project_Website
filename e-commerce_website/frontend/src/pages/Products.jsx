@@ -9,15 +9,15 @@ const LOAD_MORE_STEP = 6;
 
 export default function Products() {
   const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState("All");
+  const [category, setCategory] = useState("all");
   const [loading, setLoading] = useState(true);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
 
   const categoryOptions = [
-    { label: "ALL PRODUCTS", value: "All" },
-    { label: "ELECTRONICS", value: "Electronics" },
-    { label: "FASHIONS", value: "Fashion" },
-    { label: "BOOKS", value: "Books" },
+    { label: "ALL PRODUCTS", value: "all" },
+    { label: "ELECTRONICS", value: "electronics" },
+    { label: "FASHIONS", value: "fashions" },
+    { label: "BOOKS", value: "books" },
   ];
 
   useEffect(() => {

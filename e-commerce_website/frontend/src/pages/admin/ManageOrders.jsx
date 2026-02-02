@@ -98,7 +98,7 @@ export default function ManageOrders() {
                   <select
                     value={o.status}
                     onChange={(e) => updateStatus(o._id, e.target.value)}
-                    className="w-full border-slate-200 rounded-lg py-2 px-3 text-sm font-semibold bg-white shadow-sm focus:ring-2 focus:ring-indigo-500 transition cursor-pointer"
+                    className="w-full border-slate-200 rounded-lg py-2 px-3 text-sm font-semibold bg-white shadow-sm focus:ring-2 focus:ring-indigo-500 transition"
                   >
                     <option value="pending">Pending</option>
                     <option value="verified">Verified (Paid)</option>

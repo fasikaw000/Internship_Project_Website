@@ -3,7 +3,21 @@
 @tailwind utilities;
 
 body {
-  margin: 0;                         /* already needed */
+  margin: 0;
   font-family: system-ui, sans-serif;
   background-color: #e2e8f0;
+}
+
+@layer base {
+
+  button,
+  a,
+  select,
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
 }

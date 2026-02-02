@@ -17,7 +17,7 @@ export default function Home() {
             <span className="text-indigo-200">Welcome to</span> <span className="whitespace-nowrap text-white">MICHU-<span className="text-teal-400">GEBEYA</span></span>
           </h1>
           <p className="mb-6 text-lg text-white font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] opacity-90">
-            We are your one-stop shop for Electronics, Fashion, Books and more. Browse our curated categories and order with ease.
+            We are your one-stop shop for Electronics, Fashions, Books and more. Browse our curated categories and order with ease.
           </p>
           <Link
             to="/products"

@@ -117,7 +117,7 @@ export default function Contact() {
               required
             />
           </div>
-          <button type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded font-medium">
+          <button type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded font-medium hover:bg-indigo-700 transition">
             Send
           </button>
         </form>

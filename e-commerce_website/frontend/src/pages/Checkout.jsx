@@ -140,7 +140,7 @@ export default function Checkout() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 text-white px-4 py-2 rounded disabled:opacity-50"
+          className="w-full bg-indigo-600 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-indigo-700 transition"
         >
           {loading ? "Placing order…" : "Place order"}
         </button>
