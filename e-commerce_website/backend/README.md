@@ -1,7 +1,7 @@
-# MICHU-GEBEYA E-commerce Backend
+# MICHUGEBEYA E-commerce Backend
 
 ## Overview
-This is the backend of the **MICHU-GEBEYA** e-commerce platform. It handles users, products, orders, and automated email notifications.
+This is the backend of the **MICHUGEBEYA** e-commerce platform. It handles users, products, orders, and automated email notifications.
 
 ## Setup Instructions for a New Device
 
@@ -36,7 +36,7 @@ VITE_API_URL=http://localhost:5001/api
 
 > [!IMPORTANT]
 > **What happens when you clone this on a new computer?**
-> - **Logo**: The **MICHU-GEBEYA** logo is built with SVG code, so it will always appear perfectly on any device without needing external files.
+> - **Logo**: The **MICHUGEBEYA** logo is built with SVG code, so it will always appear perfectly on any device without needing external files.
 > - **Product Images**: Uploaded images (product photos/receipts) are stored on your local machine. These will **not** appear on the new device automatically. You will need to log in as Admin on the new device and re-upload your products.
 > - **Database**: 
 >   - If you use **MongoDB Atlas** (Cloud), all your products and orders will "follow" you to any device.

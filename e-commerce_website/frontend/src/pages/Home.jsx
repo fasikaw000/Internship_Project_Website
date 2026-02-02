@@ -14,7 +14,7 @@ export default function Home() {
       >
         <div className="w-full max-w-2xl flex flex-col justify-center items-center px-6 py-12 animate-slideUp">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg scale-100 hover:scale-105 transition-transform duration-500">
-            <span className="text-indigo-200">Welcome to</span> <span className="whitespace-nowrap text-white">MICHU-<span className="text-teal-400">GEBEYA</span></span>
+            <span className="text-indigo-200">Welcome to</span> <span className="whitespace-nowrap text-white">MICHU<span className="text-teal-400">GEBEYA</span></span>
           </h1>
           <p className="mb-6 text-lg text-white font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] opacity-90">
             We are your one-stop shop for Electronics, Fashions, Books and more. Browse our curated categories and order with ease.

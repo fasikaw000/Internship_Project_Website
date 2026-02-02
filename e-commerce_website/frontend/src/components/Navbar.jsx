@@ -38,7 +38,7 @@ export default function Navbar() {
           </svg>
         </div>
         <span className="text-xl font-black text-white tracking-tighter uppercase">
-          MICHU-<span className="text-teal-400">GEBEYA</span>
+          MICHU<span className="text-teal-400">GEBEYA</span>
         </span>
       </Link>
 

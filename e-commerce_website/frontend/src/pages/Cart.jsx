@@ -13,7 +13,7 @@ export default function Cart() {
       <h2 className="text-2xl font-bold mb-4">ItemsList(selected)</h2>
       {cart.length === 0 ? (
         <>
-          <p className="text-gray-600 mb-4">Your cart is empty. Add products from the Products page; you can unselect any item here before checkout.</p>
+          <p className="text-gray-600 mb-4">Your cart is empty. Add products from the Products page; you can unselect any item here before Order.</p>
           <Link to="/products" className="text-indigo-600 underline">Browse products</Link>
         </>
       ) : (
