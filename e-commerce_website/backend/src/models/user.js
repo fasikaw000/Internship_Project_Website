@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ["user", "admin"], default: "user" },
   accountNumber: { type: String }, // Only for admin
+  isSuspended: { type: Boolean, default: false },
+  suspensionReason: { type: String },
 });
 
 export default mongoose.model("User", userSchema);

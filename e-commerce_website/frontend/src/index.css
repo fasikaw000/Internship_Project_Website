@@ -21,3 +21,20 @@ body {
     cursor: not-allowed;
   }
 }
+
+@media print {
+  nav, footer, .no-print {
+    display: none !important;
+  }
+  body, main {
+    background-color: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  /* Force simplified layout for invoice */
+  .max-w-3xl {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}

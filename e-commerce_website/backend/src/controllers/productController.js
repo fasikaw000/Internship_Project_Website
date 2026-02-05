@@ -64,8 +64,10 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     });
   }
 
-  await Product.findByIdAndDelete(id);
-  res.json({ message: "Product removed" });
+  // Soft Delete
+  product.isDeleted = true;
+  await product.save();
+  res.json({ message: "Product removed (Soft Delete)" });
 });
 
 // Get all products (User), optional category filter
@@ -75,6 +77,14 @@ export const getProducts = asyncHandler(async (req, res) => {
   if (category && category.toLowerCase() !== "all") {
     filter.category = category.toLowerCase();
   }
+  if (category && category.toLowerCase() !== "all") {
+    filter.category = category.toLowerCase();
+  }
+
+  // Filter out soft-deleted products
+  // Filter out soft-deleted products (or those where isDeleted is not set yet)
+  filter.$or = [{ isDeleted: false }, { isDeleted: { $exists: false } }];
+
   const products = await Product.find(filter);
   res.json(products);
 });

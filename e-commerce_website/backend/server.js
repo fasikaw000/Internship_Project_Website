@@ -10,6 +10,9 @@ import productRoutes from "./src/routes/productRoutes.js";
 import orderRoutes from "./src/routes/orderRoutes.js";
 import commentRoutes from "./src/routes/commentRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
+import couponRoutes from "./src/routes/couponRoutes.js";
+import reviewRoutes from "./src/routes/reviewRoutes.js";
+import paymentRoutes from "./src/routes/paymentRoutes.js";
 import { errorMiddleware } from "./src/utils/errorHandler.js";
 
 // Load environment variables
@@ -59,6 +62,9 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/coupons", couponRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // Health check route
 app.get("/", (req, res) => {

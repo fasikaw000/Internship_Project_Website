@@ -16,11 +16,16 @@ import Register from "./pages/Register";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
+import Invoice from "./pages/Invoice";
 import UserProfile from "./pages/UserProfile";
+import Tracking from "./pages/Tracking";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailed from "./pages/PaymentFailed";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManageProducts from "./pages/admin/ManageProducts";
+import AddEditProduct from "./pages/admin/AddEditProduct";
 import ManageOrders from "./pages/admin/ManageOrders";
 import ManageComments from "./pages/admin/ManageComments";
 import ViewCustomers from "./pages/admin/ViewCustomers";
@@ -48,11 +53,17 @@ function App() {
           <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
           <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          <Route path="/order/:id/invoice" element={<ProtectedRoute><Invoice /></ProtectedRoute>} />
+          <Route path="/order/:id/track" element={<ProtectedRoute><Tracking /></ProtectedRoute>} />
+          <Route path="/payment/success/:id" element={<PaymentSuccess />} />
+          <Route path="/payment/failed" element={<PaymentFailed />} />
           <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
 
           {/* Admin Routes */}
           <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/products" element={<ProtectedRoute adminOnly><ManageProducts /></ProtectedRoute>} />
+          <Route path="/admin/product/new" element={<ProtectedRoute adminOnly><AddEditProduct /></ProtectedRoute>} />
+          <Route path="/admin/product/edit/:id" element={<ProtectedRoute adminOnly><AddEditProduct /></ProtectedRoute>} />
           <Route path="/admin/orders" element={<ProtectedRoute adminOnly><ManageOrders /></ProtectedRoute>} />
           <Route path="/admin/comments" element={<ProtectedRoute adminOnly><ManageComments /></ProtectedRoute>} />
           <Route path="/admin/customers" element={<ProtectedRoute adminOnly><ViewCustomers /></ProtectedRoute>} />

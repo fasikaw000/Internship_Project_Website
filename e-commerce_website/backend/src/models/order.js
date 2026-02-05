@@ -16,7 +16,19 @@ const orderSchema = new mongoose.Schema({
     address: String,
   },
   receiptImage: { type: String }, // uploaded by user
-  status: { type: String, enum: ["pending", "verified", "delivered", "cancelled"], default: "pending" },
+  paymentRef: { type: String }, // Chapa Transaction Reference
+  status: {
+    type: String,
+    enum: ["pending", "pending_payment", "verified", "shipped", "delivered", "cancelled", "refunded", "receipt_rejected"],
+    default: "pending_payment",
+  },
+  statusHistory: [
+    {
+      status: { type: String },
+      timestamp: { type: Date, default: Date.now },
+      comment: { type: String },
+    },
+  ],
   createdAt: { type: Date, default: Date.now },
 });
 

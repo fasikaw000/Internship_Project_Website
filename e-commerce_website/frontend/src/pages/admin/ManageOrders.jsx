@@ -38,6 +38,17 @@ export default function ManageOrders() {
     }
   };
 
+  const requestResubmission = async (id) => {
+    if (!window.confirm("Are you sure you want to request a receipt resubmission? This will notify the customer via email.")) return;
+    try {
+      await api.post(`/admin/order/${id}/resubmit-receipt`);
+      alert("Resubmission request sent to customer.");
+      loadOrders();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to request resubmission.");
+    }
+  };
+
   const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5001/api").replace("/api", "");
 
   if (loading) {
@@ -98,12 +109,14 @@ export default function ManageOrders() {
                   <select
                     value={o.status}
                     onChange={(e) => updateStatus(o._id, e.target.value)}
-                    className="w-full border-slate-200 rounded-lg py-2 px-3 text-sm font-semibold bg-white shadow-sm focus:ring-2 focus:ring-indigo-500 transition"
+                    disabled={o.status === "delivered"}
+                    className={`w-full border-slate-200 rounded-lg py-2 px-3 text-sm font-semibold bg-white shadow-sm focus:ring-2 focus:ring-indigo-500 transition ${o.status === "delivered" ? "opacity-50 cursor-not-allowed bg-slate-100" : ""}`}
                   >
                     <option value="pending">Pending</option>
                     <option value="verified">Verified (Paid)</option>
                     <option value="delivered">Delivered</option>
                     <option value="cancelled">Cancelled</option>
+                    <option value="receipt_rejected">Receipt Rejected</option>
                   </select>
                 </div>
               </div>
@@ -145,7 +158,22 @@ export default function ManageOrders() {
                 <div className="z-10">
                   <p className="text-[10px] font-black uppercase tracking-widest text-indigo-300 opacity-60 mb-2">Total Amount</p>
                   <p className="text-3xl font-black">{o.totalPrice?.toFixed(2)}</p>
-                  <p className="text-xs font-medium text-indigo-200 mb-8 tracking-wider">ETB</p>
+                  <p className="text-xs font-medium text-indigo-200 mb-6 tracking-wider">ETB</p>
+
+                  {/* Order Timeline */}
+                  {o.statusHistory && o.statusHistory.length > 0 && (
+                    <div className="mb-4 text-left px-4">
+                      <p className="text-[8px] font-black uppercase tracking-widest text-indigo-300 opacity-60 mb-1">Timeline</p>
+                      <div className="max-h-24 overflow-y-auto space-y-2 pr-1 scrollbar-thin scrollbar-thumb-indigo-700">
+                        {o.statusHistory.slice().reverse().map((hist, i) => (
+                          <div key={i} className="text-[9px] text-indigo-100 border-l-2 border-indigo-400 pl-2">
+                            <p className="font-bold opacity-90">{hist.status?.replace("_", " ").toUpperCase()}</p>
+                            <p className="opacity-60">{new Date(hist.timestamp).toLocaleDateString()} {new Date(hist.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="z-10 bg-indigo-800 p-4 rounded-2xl border border-indigo-700/50 shadow-inner">
@@ -161,6 +189,15 @@ export default function ManageOrders() {
                     </a>
                   ) : (
                     <span className="text-xs text-indigo-300 font-semibold italic">No receipt uploaded</span>
+                  )}
+
+                  {o.receiptImage && o.status !== "verified" && o.status !== "delivered" && (
+                    <button
+                      onClick={() => requestResubmission(o._id)}
+                      className="mt-3 w-full bg-indigo-700/50 hover:bg-indigo-700 text-indigo-100 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wide transition border border-indigo-600/30"
+                    >
+                      Request Re-upload
+                    </button>
                   )}
                 </div>
               </div>

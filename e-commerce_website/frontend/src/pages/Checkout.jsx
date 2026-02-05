@@ -25,7 +25,7 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getBankInfo().then(setBank).catch(() => { });
+    // No bank info needed for Chapa
   }, []);
 
   useEffect(() => {
@@ -59,28 +59,31 @@ export default function Checkout() {
     if (emailErr) errors.push(emailErr);
     const addressErr = validateAddressAddisAbaba(trimmed.address);
     if (addressErr) errors.push(addressErr);
-    if (!receipt) errors.push("Payment receipt");
+    // No receipt validation
     if (errors.length > 0) {
       alert("Please complete all required fields:\n\n• " + errors.join("\n• "));
       return;
     }
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append(
-        "products",
-        JSON.stringify(cart.map((item) => ({ product: item._id, quantity: item.quantity })))
-      );
-      formData.append("deliveryInfo", JSON.stringify(trimmed));
-      formData.append("receiptImage", receipt);
-      await placeOrder(formData);
-      alert("Order placed successfully. We will confirm after verifying your payment.");
+      const payload = {
+        products: cart.map((item) => ({ product: item._id, quantity: item.quantity })),
+        deliveryInfo: trimmed
+      };
+
+      const response = await placeOrder(payload); // Now returns { order, paymentUrl }
+
+      // Redirect to Chapa
+      if (response.paymentUrl) {
+        window.location.href = response.paymentUrl;
+      } else {
+        alert("Order created but payment initialization failed. Please check My Orders.");
+        navigate("/orders");
+      }
       clearCart();
-      navigate("/orders");
     } catch (err) {
       alert(err.response?.data?.message || "Failed to place order. Please try again.");
       console.error(err);
-    } finally {
       setLoading(false);
     }
   };
@@ -89,11 +92,12 @@ export default function Checkout() {
     <div className="p-6 max-w-lg mx-auto animate-fadeIn">
       <h2 className="text-2xl font-bold mb-4">Checkout</h2>
 
-      {/* Admin CBE account - visible for payment */}
-      <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded">
-        <p className="font-bold text-gray-800">Pay to this CBE account:</p>
-        <p className="mt-1">Account name: {bank.fullName}</p>
-        <p>Account number: {bank.accountNumber}</p>
+      <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded flex gap-4 items-center">
+        <div className="text-3xl">💳</div>
+        <div>
+          <p className="font-bold text-indigo-900">Secure Payment</p>
+          <p className="text-sm text-indigo-700">You will be redirected to Chapa for secure payment (Telebirr, CBE, Cards, etc.)</p>
+        </div>
       </div>
 
       <form onSubmit={submitHandler} className="space-y-3">
@@ -128,21 +132,12 @@ export default function Checkout() {
           onChange={(e) => setForm({ ...form, address: e.target.value })}
           required
         />
-        <div>
-          <label className="block text-sm text-gray-600 mb-1">Upload payment receipt (screenshot)</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setReceipt(e.target.files?.[0] || null)}
-            className="border w-full p-2"
-          />
-        </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-indigo-700 transition"
+          className="w-full bg-green-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:bg-green-700 transition flex justify-center items-center gap-2"
         >
-          {loading ? "Placing order…" : "Place order"}
+          {loading ? "Processing..." : "Pay Now with Chapa"}
         </button>
       </form>
     </div>
