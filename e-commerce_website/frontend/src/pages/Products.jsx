@@ -60,13 +60,12 @@ export default function Products() {
       {/* Header & Controls */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Our Collection</h2>
-          <p className="text-slate-500 mt-1">Discover premium quality products</p>
+          <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Discover Premium Quality Products</p>
         </div>
 
         {user?.role === "admin" && (
           <Link
-            to="/admin"
+            to="/admin/product/new"
             className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg hover:bg-indigo-700 hover:scale-105 transition flex items-center gap-2"
           >
             <span>+</span> Add New Product

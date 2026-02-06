@@ -125,7 +125,7 @@ export default function Orders() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto animate-fadeIn min-h-screen">
-      <h2 className="text-3xl font-extrabold mb-8 text-slate-900">My Orders</h2>
+
 
       {/* Controls: Search & Tabs */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">

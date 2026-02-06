@@ -25,7 +25,15 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // No bank info needed for Chapa
+    const fetchBank = async () => {
+      try {
+        const info = await getBankInfo();
+        setBank(info);
+      } catch (error) {
+        console.error("Failed to fetch bank info", error);
+      }
+    };
+    fetchBank();
   }, []);
 
   useEffect(() => {
@@ -59,28 +67,34 @@ export default function Checkout() {
     if (emailErr) errors.push(emailErr);
     const addressErr = validateAddressAddisAbaba(trimmed.address);
     if (addressErr) errors.push(addressErr);
-    // No receipt validation
+
+    if (!receipt) {
+      errors.push("Please upload the payment receipt.");
+    }
+
     if (errors.length > 0) {
       alert("Please complete all required fields:\n\n• " + errors.join("\n• "));
       return;
     }
     setLoading(true);
     try {
-      const payload = {
-        products: cart.map((item) => ({ product: item._id, quantity: item.quantity })),
-        deliveryInfo: trimmed
-      };
+      const formData = new FormData();
+      formData.append("deliveryInfo", JSON.stringify(trimmed));
+      formData.append("receiptImage", receipt);
+      // Products are handled by backend from cart or we send them?
+      // Check orderService/backend: usually backend might take products from body or we send them.
+      // Looking at `placeOrder` in orderService, it sends `formData`.
+      // Backend usually expects `products` in body or creates from User's cart if stored in DB?
+      // Let's assume we need to send products array as JSON string if backend expects it in FormData
+      // PREVIOUS LOGIC (from memory/inference): It likely sent product IDs.
+      // SAFE BET: Send products array.
+      formData.append("products", JSON.stringify(cart.map((item) => ({ product: item._id, quantity: item.quantity }))));
 
-      const response = await placeOrder(payload); // Now returns { order, paymentUrl }
+      await placeOrder(formData);
 
-      // Redirect to Chapa
-      if (response.paymentUrl) {
-        window.location.href = response.paymentUrl;
-      } else {
-        alert("Order created but payment initialization failed. Please check My Orders.");
-        navigate("/orders");
-      }
+      alert("Order placed successfully! We will verify your receipt and update the status.");
       clearCart();
+      navigate("/orders");
     } catch (err) {
       alert(err.response?.data?.message || "Failed to place order. Please try again.");
       console.error(err);
@@ -90,14 +104,18 @@ export default function Checkout() {
 
   return (
     <div className="p-6 max-w-lg mx-auto animate-fadeIn">
-      <h2 className="text-2xl font-bold mb-4">Checkout</h2>
 
-      <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded flex gap-4 items-center">
-        <div className="text-3xl">💳</div>
-        <div>
-          <p className="font-bold text-indigo-900">Secure Payment</p>
-          <p className="text-sm text-indigo-700">You will be redirected to Chapa for secure payment (Telebirr, CBE, Cards, etc.)</p>
+
+      {/* Bank Info Section */}
+      <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded text-center">
+        <p className="font-bold text-indigo-900">Bank Transfer Details</p>
+        <p className="text-sm text-indigo-700 mb-2">Please transfer the total amount to:</p>
+        <div className="bg-white p-3 rounded shadow-sm inline-block text-left">
+          <p className="text-gray-600 text-sm">Bank: <span className="font-bold text-gray-800">CBE (Commercial Bank of Ethiopia)</span></p>
+          <p className="text-gray-600 text-sm">Account Name: <span className="font-bold text-gray-800">{bank.fullName || "Loading..."}</span></p>
+          <p className="text-gray-600 text-sm">Account Number: <span className="font-mono font-bold text-indigo-600 text-lg">{bank.accountNumber || "Wait..."}</span></p>
         </div>
+        <p className="text-xs text-indigo-500 mt-2">Upload the receipt screenshot below after transfer.</p>
       </div>
 
       <form onSubmit={submitHandler} className="space-y-3">
@@ -132,12 +150,24 @@ export default function Checkout() {
           onChange={(e) => setForm({ ...form, address: e.target.value })}
           required
         />
+
+        <div className="border border-dashed border-indigo-300 bg-indigo-50/50 p-4 rounded-xl text-center">
+          <label className="block text-indigo-900 font-bold text-sm mb-2">Upload Payment Receipt</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setReceipt(e.target.files[0])}
+            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            required
+          />
+        </div>
+
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-green-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:bg-green-700 transition flex justify-center items-center gap-2"
+          className="w-full bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition flex justify-center items-center gap-2"
         >
-          {loading ? "Processing..." : "Pay Now with Chapa"}
+          {loading ? "Processing..." : "Place Order"}
         </button>
       </form>
     </div>

@@ -26,6 +26,7 @@ import PaymentFailed from "./pages/PaymentFailed";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManageProducts from "./pages/admin/ManageProducts";
 import AddEditProduct from "./pages/admin/AddEditProduct";
+import DeleteProduct from "./pages/admin/DeleteProduct";
 import ManageOrders from "./pages/admin/ManageOrders";
 import ManageComments from "./pages/admin/ManageComments";
 import ViewCustomers from "./pages/admin/ViewCustomers";
@@ -64,6 +65,7 @@ function App() {
           <Route path="/admin/products" element={<ProtectedRoute adminOnly><ManageProducts /></ProtectedRoute>} />
           <Route path="/admin/product/new" element={<ProtectedRoute adminOnly><AddEditProduct /></ProtectedRoute>} />
           <Route path="/admin/product/edit/:id" element={<ProtectedRoute adminOnly><AddEditProduct /></ProtectedRoute>} />
+          <Route path="/admin/product/delete/:id" element={<ProtectedRoute adminOnly><DeleteProduct /></ProtectedRoute>} />
           <Route path="/admin/orders" element={<ProtectedRoute adminOnly><ManageOrders /></ProtectedRoute>} />
           <Route path="/admin/comments" element={<ProtectedRoute adminOnly><ManageComments /></ProtectedRoute>} />
           <Route path="/admin/customers" element={<ProtectedRoute adminOnly><ViewCustomers /></ProtectedRoute>} />

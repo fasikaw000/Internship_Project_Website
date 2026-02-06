@@ -48,8 +48,8 @@ export default function Navbar() {
         <div className="hidden lg:flex gap-7 items-center">
           <NavLink to="/" end className={navClass}>Home</NavLink>
           <NavLink to="/products" className={navClass}>Products</NavLink>
-          <NavLink to="/contact" className={navClass}>Contact Us</NavLink>
-          <NavLink to="/about" className={navClass}>About Us</NavLink>
+          <NavLink to="/contact" className={navClass}>Contact</NavLink>
+          <NavLink to="/about" className={navClass}>About</NavLink>
           {user && <NavLink to="/cart" className={navClass}>Cart</NavLink>}
           {user && <NavLink to="/orders" className={navClass}>My Orders</NavLink>}
           {isAdmin && <NavLink to="/admin" className={navClass}>Admin</NavLink>}

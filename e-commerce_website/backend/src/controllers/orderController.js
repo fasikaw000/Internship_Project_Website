@@ -58,6 +58,16 @@ export const createOrder = asyncHandler(async (req, res) => {
     await product.save();
   }
 
+  /* 
+   * PAYMENT LOGIC UPDATE:
+   * If a receipt image is uploaded, we assume manual bank transfer.
+   * If no receipt, we could fallback to Chapa, but currently frontend forces receipt.
+   */
+  let receiptImage = null;
+  if (req.file) {
+    receiptImage = req.file.filename;
+  }
+
   const tx_ref = `tx-${Date.now()}`;
 
   const order = await Order.create({
@@ -65,12 +75,18 @@ export const createOrder = asyncHandler(async (req, res) => {
     products,
     totalPrice,
     deliveryInfo,
-    paymentRef: tx_ref,
-    status: "pending_payment", // Initial status for Chapa
-    statusHistory: [{ status: "pending_payment", comment: "Order initialized, waiting for payment" }],
+    paymentRef: receiptImage ? null : tx_ref, // Use tx_ref only if using Chapa (no receipt)
+    receiptImage: receiptImage,
+    status: receiptImage ? "pending_payment" : "pending_payment",
+    statusHistory: [{ status: "pending_payment", comment: "Order placed. Waiting for verification." }],
   });
 
-  // Initialize Chapa Payment
+  // If we have a receipt, we are done. Return success.
+  if (receiptImage) {
+    return res.status(201).json({ order, message: "Order placed successfully. Receipt uploaded." });
+  }
+
+  // Fallback to Chapa (Only if no receipt uploaded, though frontend validates existence)
   try {
     const paymentUrl = await initializePayment(order, req.user);
     res.status(201).json({ order, paymentUrl });

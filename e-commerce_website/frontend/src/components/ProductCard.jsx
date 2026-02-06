@@ -98,9 +98,7 @@ export default function ProductCard({ product, onDelete }) {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if (window.confirm("Are you sure you want to delete this product?")) {
-                if (onDelete) onDelete(product._id);
-              }
+              navigate(`/admin/product/delete/${product._id}`);
             }}
             className="p-2 bg-white text-red-600 rounded-full shadow hover:bg-red-50 transition border border-red-100"
             title="Delete Product"

@@ -20,13 +20,19 @@ export const initializePayment = async (order, user) => {
     // For Chapa specific return_url
     const RETURN_URL = `${process.env.CLIENT_URL || "http://localhost:5173"}/payment/success/${order._id}`;
 
+    const tx_ref = `tx-${order._id}-${Date.now()}`; // Unique transaction reference
+
+    // Save the tx_ref to the order first!
+    order.paymentRef = tx_ref;
+    await order.save();
+
     const data = {
         amount: order.totalPrice,
         currency: "ETB",
         email: user.email,
         first_name: user.fullName.split(" ")[0],
         last_name: user.fullName.split(" ")[1] || "User",
-        tx_ref: `tx-${order._id}-${Date.now()}`, // Unique transaction reference
+        tx_ref: tx_ref,
         callback_url: CALLBACK_URL,
         return_url: RETURN_URL,
         customization: {

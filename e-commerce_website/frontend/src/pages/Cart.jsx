@@ -45,7 +45,7 @@ export default function Cart() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto animate-fadeIn min-h-screen">
-      <h2 className="text-3xl font-extrabold mb-8 text-slate-900">Shopping Cart</h2>
+
 
       {cart.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
