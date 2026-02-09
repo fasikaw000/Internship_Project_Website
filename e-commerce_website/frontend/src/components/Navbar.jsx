@@ -50,15 +50,29 @@ export default function Navbar() {
           <NavLink to="/products" className={navClass}>Products</NavLink>
           <NavLink to="/contact" className={navClass}>Contact</NavLink>
           <NavLink to="/about" className={navClass}>About</NavLink>
-          {user && <NavLink to="/cart" className={navClass}>Cart</NavLink>}
+          <NavLink to="/cart" className={navClass}>Cart</NavLink>
           {user && <NavLink to="/orders" className={navClass}>My Orders</NavLink>}
-          {isAdmin && <NavLink to="/admin" className={navClass}>Admin</NavLink>}
+          {isAdmin && (
+            <div className="ml-4 pl-4 border-l border-slate-700">
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-tighter transition-all duration-300 ${isActive
+                    ? "bg-teal-500 text-white shadow-lg shadow-teal-500/50"
+                    : "bg-slate-800 text-teal-400 hover:bg-slate-700 hover:text-white"
+                  }`
+                }
+              >
+                Dashboard
+              </NavLink>
+            </div>
+          )}
         </div>
 
         <div className="hidden lg:flex gap-4 items-center font-medium">
           {!user ? (
             <>
-              <NavLink to="/login" className={navClass}>Login</NavLink>
+              <NavLink to="/login" className={navClass}>Sign In</NavLink>
               <Link to="/register" className="bg-white hover:bg-teal-50 text-teal-700 px-3 py-1.5 rounded-lg font-medium transition">Register</Link>
             </>
           ) : (
@@ -91,14 +105,14 @@ export default function Navbar() {
           <NavLink to="/products" className={navClass} onClick={() => setIsMenuOpen(false)}>Products</NavLink>
           <NavLink to="/contact" className={navClass} onClick={() => setIsMenuOpen(false)}>Contact Us</NavLink>
           <NavLink to="/about" className={navClass} onClick={() => setIsMenuOpen(false)}>About Us</NavLink>
-          {user && <NavLink to="/cart" className={navClass} onClick={() => setIsMenuOpen(false)}>Cart</NavLink>}
+          <NavLink to="/cart" className={navClass} onClick={() => setIsMenuOpen(false)}>Cart</NavLink>
           {user && <NavLink to="/orders" className={navClass} onClick={() => setIsMenuOpen(false)}>My Orders</NavLink>}
           {isAdmin && <NavLink to="/admin" className={navClass} onClick={() => setIsMenuOpen(false)}>Admin</NavLink>}
 
           <div className="border-t border-slate-700 pt-4 flex flex-col gap-3">
             {!user ? (
               <>
-                <NavLink to="/login" className={navClass} onClick={() => setIsMenuOpen(false)}>Login</NavLink>
+                <NavLink to="/login" className={navClass} onClick={() => setIsMenuOpen(false)}>Sign In</NavLink>
                 <Link to="/register" className="bg-white hover:bg-teal-50 text-teal-700 px-3 py-2 rounded-lg font-medium transition text-center" onClick={() => setIsMenuOpen(false)}>Register</Link>
               </>
             ) : (

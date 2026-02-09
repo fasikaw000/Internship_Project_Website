@@ -16,14 +16,16 @@ export default function Products() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("newest");
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState(null);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
 
-  const categoryOptions = [
-    { label: "ALL PRODUCTS", value: "all" },
-    { label: "ELECTRONICS", value: "electronics" },
-    { label: "FASHIONS", value: "fashions" },
-    { label: "BOOKS", value: "books" },
-  ];
+  const categoryOptions = ["all", "electronics", "fashions", "books"];
+
+  const showNotification = (msg, type = "error") => {
+    setNotification({ msg, type });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => setNotification(null), 5000);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -37,9 +39,9 @@ export default function Products() {
     try {
       await deleteProduct(id);
       setProducts((prev) => prev.filter((p) => p._id !== id));
-      alert("Product deleted successfully");
+      showNotification("Product deleted successfully", "success");
     } catch (err) {
-      alert("Failed to delete product");
+      showNotification("Failed to delete product");
     }
   };
 
@@ -56,7 +58,17 @@ export default function Products() {
   const hasMore = filteredProducts.length > showCount;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto animate-fadeIn min-h-screen">
+    <div className="p-6 max-w-7xl mx-auto animate-fadeIn min-h-screen relative">
+      {/* Notification Banner */}
+      {notification && (
+        <div className={`mb-6 p-4 rounded-2xl border animate-slideDown flex items-center gap-3 shadow-sm ${notification.type === "success"
+          ? "bg-emerald-50 border-emerald-100 text-emerald-800"
+          : "bg-rose-50 border-rose-100 text-rose-800"
+          }`}>
+          <span className="text-xl">{notification.type === "success" ? "✅" : "⚠️"}</span>
+          <p className="font-bold text-sm tracking-tight">{notification.msg}</p>
+        </div>
+      )}
       {/* Header & Controls */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <div>

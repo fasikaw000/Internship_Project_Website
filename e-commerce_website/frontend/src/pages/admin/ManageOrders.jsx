@@ -8,6 +8,7 @@ export default function ManageOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [notif, setNotif] = useState({ message: "", type: "" });
 
   const loadOrders = async () => {
     setLoading(true);
@@ -27,25 +28,35 @@ export default function ManageOrders() {
   }, []);
 
   const updateStatus = async (id, status) => {
+    setNotif({ message: "", type: "" });
     try {
       await api.put(`/orders/${id}`, { status });
       loadOrders();
       if (status === "completed") {
-        alert("Transaction completed. Customer will see this status.");
+        setNotif({ message: "Transaction completed. Customer will see this status.", type: "success" });
+      } else {
+        setNotif({ message: `Order status updated to ${status}`, type: "success" });
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to update status.");
+      setNotif({ message: err.response?.data?.message || "Failed to update status.", type: "error" });
     }
   };
 
+  const [confirmResubmitId, setConfirmResubmitId] = useState(null);
+
   const requestResubmission = async (id) => {
-    if (!window.confirm("Are you sure you want to request a receipt resubmission? This will notify the customer via email.")) return;
+    setNotif({ message: "", type: "" });
+    setLoading(true);
     try {
       await api.post(`/admin/order/${id}/resubmit-receipt`);
-      alert("Resubmission request sent to customer.");
+      setNotif({ message: "Resubmission request sent to customer.", type: "success" });
+      setConfirmResubmitId(null);
       loadOrders();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to request resubmission.");
+      setNotif({ message: err.response?.data?.message || "Failed to request resubmission.", type: "error" });
+      setConfirmResubmitId(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,6 +91,39 @@ export default function ManageOrders() {
       </div>
       <h2 className="text-3xl font-extrabold mb-8 text-slate-900 tracking-tight">Manage Orders</h2>
 
+      {confirmResubmitId && (
+        <div className="mb-6 p-6 bg-indigo-50 border border-indigo-100 rounded-2xl animate-fadeIn text-center shadow-lg shadow-indigo-100">
+          <p className="text-indigo-900 font-black mb-1 uppercase tracking-widest text-xs">⚠ Action Required</p>
+          <p className="text-indigo-700 text-sm mb-4">Are you sure you want to request a receipt resubmission? This will notify the customer via email.</p>
+          <div className="flex justify-center gap-4">
+            <button
+              onClick={() => requestResubmission(confirmResubmitId)}
+              disabled={loading}
+              className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition"
+            >
+              {loading ? "Sending..." : "Yes, Request Re-upload"}
+            </button>
+            <button
+              onClick={() => setConfirmResubmitId(null)}
+              className="px-6 py-2 bg-white text-slate-600 font-bold rounded-lg hover:bg-slate-50 transition border border-slate-200"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {notif.message && (
+        <div className={`mb-6 p-4 rounded-xl border text-sm font-medium flex items-center shadow-sm animate-slideDown ${notif.type === "success"
+          ? "bg-green-50 border-green-100 text-green-700"
+          : "bg-red-50 border-red-100 text-red-700"
+          }`}>
+          <span className="mr-2">{notif.type === "success" ? "✓" : "⚠"}</span>
+          {notif.message}
+          <button onClick={() => setNotif({ message: "", type: "" })} className="ml-auto opacity-50 hover:opacity-100 px-2">✕</button>
+        </div>
+      )}
+
       {orders.length === 0 ? (
         <div className="bg-white p-12 text-center rounded-2xl border border-dashed border-slate-300">
           <p className="text-slate-400 font-medium">No orders have been placed yet.</p>
@@ -101,6 +145,11 @@ export default function ManageOrders() {
                   <div className="space-y-2 mb-6">
                     <p className="text-xs text-slate-600"><span className="font-bold text-slate-400 uppercase text-[9px]">Phone:</span> {o.deliveryInfo?.phone}</p>
                     <p className="text-xs text-slate-600 leading-relaxed"><span className="font-bold text-slate-400 uppercase text-[9px]">Ship to:</span> {o.deliveryInfo?.address}</p>
+                    <div className="pt-2">
+                      <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full ${o.paymentMethod === 'cod' ? 'bg-teal-100 text-teal-700' : 'bg-slate-100 text-slate-600'}`}>
+                        Method: {o.paymentMethod?.toUpperCase() || 'TRANSFER'}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -193,7 +242,10 @@ export default function ManageOrders() {
 
                   {o.receiptImage && o.status !== "verified" && o.status !== "delivered" && (
                     <button
-                      onClick={() => requestResubmission(o._id)}
+                      onClick={() => {
+                        setConfirmResubmitId(o._id);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
                       className="mt-3 w-full bg-indigo-700/50 hover:bg-indigo-700 text-indigo-100 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wide transition border border-indigo-600/30"
                     >
                       Request Re-upload

@@ -20,6 +20,7 @@ export default function AddEditProduct() {
     const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState("");
 
     useEffect(() => {
         if (isEditMode) {
@@ -61,6 +62,7 @@ export default function AddEditProduct() {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        setSuccess("");
 
         try {
             const data = new FormData();
@@ -75,12 +77,12 @@ export default function AddEditProduct() {
 
             if (isEditMode) {
                 await updateProduct(id, data);
-                alert("Product updated successfully!");
+                setSuccess("Product updated successfully! Redirecting...");
             } else {
                 await addProduct(data);
-                alert("Product added successfully!");
+                setSuccess("Product added successfully! Redirecting...");
             }
-            navigate("/products");
+            setTimeout(() => navigate("/products"), 2000);
         } catch (err) {
             setError(err.response?.data?.message || "Operation failed.");
         } finally {
@@ -97,7 +99,8 @@ export default function AddEditProduct() {
                 <Link to="/products" className="text-indigo-600 hover:underline font-medium">Cancel</Link>
             </div>
 
-            {error && <div className="p-4 mb-6 bg-red-100 text-red-700 rounded-lg border border-red-200">{error}</div>}
+            {success && <div className="p-4 mb-6 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 font-bold animate-fadeIn">✅ {success}</div>}
+            {error && <div className="p-4 mb-6 bg-red-100 text-red-700 rounded-xl border border-red-200 animate-shake">{error}</div>}
 
             <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 space-y-6">
                 {/* Name */}

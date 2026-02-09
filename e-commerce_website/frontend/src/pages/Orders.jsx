@@ -1,7 +1,4 @@
-import { useEffect, useState } from "react";
-import { getMyOrders, resubmitReceipt } from "../services/orderService";
-import { Link } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5001/api").replace("/api", "");
 
 export default function Orders() {
   const { user } = useAuth();
@@ -9,9 +6,12 @@ export default function Orders() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
-  const [trackingOrder, setTrackingOrder] = useState(null);
-
-  const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5001/api").replace("/api", "");
+  const [notification, setNotification] = useState(null);
+  const showNotification = (msg, type = "error") => {
+    setNotification({ msg, type });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => setNotification(null), 5000);
+  };
 
   useEffect(() => {
     if (!user) {
@@ -28,18 +28,18 @@ export default function Orders() {
   }, [user]);
 
   const handleResubmit = async (orderId, file) => {
-    if (!file) return alert("Please select a file first.");
+    if (!file) return showNotification("Please select a file first.");
     const formData = new FormData();
     formData.append("receiptImage", file);
 
     try {
       await resubmitReceipt(orderId, formData);
-      alert("Receipt uploaded successfully. Order is now pending verification.");
+      showNotification("Receipt uploaded successfully. Order is now pending verification.", "success");
       // Refresh
       const data = await getMyOrders();
       setOrders(data);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to upload receipt.");
+      showNotification(err.response?.data?.message || "Failed to upload receipt.");
     }
   };
 
@@ -124,23 +124,38 @@ export default function Orders() {
   );
 
   return (
-    <div className="p-6 max-w-5xl mx-auto animate-fadeIn min-h-screen">
+    <div className="p-6 max-w-5xl mx-auto animate-fadeIn min-h-screen relative">
+      {/* Notification Banner */}
+      {notification && (
+        <div className={`mb-6 p-4 rounded-2xl border animate-slideDown flex items-center gap-3 shadow-sm ${notification.type === "success"
+          ? "bg-emerald-50 border-emerald-100 text-emerald-800"
+          : "bg-rose-50 border-rose-100 text-rose-800"
+          }`}>
+          <span className="text-xl">{notification.type === "success" ? "✅" : "⚠️"}</span>
+          <p className="font-bold text-sm tracking-tight">{notification.msg}</p>
+        </div>
+      )}
 
 
       {/* Controls: Search & Tabs */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
         {/* Tabs */}
         <div className="flex gap-2">
-          {["all", "active", "completed", "cancelled"].map(tab => (
+          {[
+            { key: "all", label: "All" },
+            { key: "active", label: "Active" },
+            { key: "completed", label: "Delivered" },
+            { key: "cancelled", label: "Cancelled" }
+          ].map(tab => (
             <button
-              key={tab}
-              onClick={() => setFilter(tab)}
-              className={`px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide transition ${filter === tab
+              key={tab.key}
+              onClick={() => setFilter(tab.key)}
+              className={`px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide transition ${filter === tab.key
                 ? "bg-indigo-600 text-white shadow-md"
                 : "text-slate-500 hover:bg-slate-50"
                 }`}
             >
-              {tab}
+              {tab.label}
             </button>
           ))}
         </div>
@@ -189,6 +204,12 @@ export default function Orders() {
                         {o.deliveryInfo?.address}
                       </span>
                     </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Method</p>
+                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${o.paymentMethod === 'cod' ? 'bg-teal-100 text-teal-700' : 'bg-slate-100 text-slate-600'}`}>
+                      {o.paymentMethod?.toUpperCase() || 'TRANSFER'}
+                    </span>
                   </div>
                 </div>
                 <div className="text-right">
@@ -245,7 +266,7 @@ export default function Orders() {
                         <input
                           type="file"
                           onChange={(e) => {
-                            if (e.target.files[0] && window.confirm("Upload this receipt?")) {
+                            if (e.target.files[0]) {
                               handleResubmit(o._id, e.target.files[0]);
                             }
                           }}

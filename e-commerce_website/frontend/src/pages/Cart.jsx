@@ -10,38 +10,57 @@ export default function Cart() {
   const grandTotal = cart.reduce((sum, item) => sum + lineTotal(item), 0);
 
   // Reusable Quantity Control Component
-  const QuantityControl = ({ item }) => (
-    <div className="flex items-center border border-slate-200 rounded-lg">
-      <button
-        onClick={() => updateQty(item._id, Math.max(1, item.quantity - 1))}
-        className="px-3 py-1 hover:bg-slate-50 text-slate-600 transition"
-      >
-        −
-      </button>
-      <input
-        type="number"
-        min="1"
-        max={item.stock}
-        value={item.quantity}
-        onChange={(e) => {
-          const val = Number(e.target.value);
-          if (val <= item.stock) updateQty(item._id, val);
-          else {
-            alert(`Only ${item.stock} left in stock.`);
-            updateQty(item._id, item.stock);
-          }
-        }}
-        className="w-10 text-center text-sm font-semibold focus:outline-none"
-      />
-      <button
-        onClick={() => updateQty(item._id, Math.min(item.stock, item.quantity + 1))}
-        disabled={item.quantity >= item.stock}
-        className={`px-3 py-1 hover:bg-slate-50 text-slate-600 transition ${item.quantity >= item.stock ? 'opacity-50 cursor-not-allowed' : ''}`}
-      >
-        +
-      </button>
-    </div>
-  );
+  const QuantityControl = ({ item }) => {
+    const [stockError, setStockError] = useState("");
+
+    return (
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden h-9">
+          <button
+            onClick={() => {
+              setStockError("");
+              updateQty(item._id, Math.max(1, item.quantity - 1));
+            }}
+            className="px-3 py-1 hover:bg-slate-50 text-slate-600 transition"
+          >
+            −
+          </button>
+          <input
+            type="number"
+            min="1"
+            max={item.stock}
+            value={item.quantity}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              if (val <= item.stock) {
+                setStockError("");
+                updateQty(item._id, val);
+              } else {
+                setStockError(`Only ${item.stock} in stock`);
+                updateQty(item._id, item.stock);
+              }
+            }}
+            className="w-10 text-center text-xs font-bold focus:outline-none"
+          />
+          <button
+            onClick={() => {
+              if (item.quantity < item.stock) {
+                setStockError("");
+                updateQty(item._id, item.quantity + 1);
+              } else {
+                setStockError(`Stock limit reached`);
+              }
+            }}
+            disabled={item.quantity >= item.stock}
+            className={`px-3 py-1 hover:bg-slate-50 text-slate-600 transition ${item.quantity >= item.stock ? 'opacity-30 cursor-not-allowed' : ''}`}
+          >
+            +
+          </button>
+        </div>
+        {stockError && <p className="text-[10px] font-bold text-red-500 animate-pulse px-1">{stockError}</p>}
+      </div>
+    );
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto animate-fadeIn min-h-screen">
@@ -86,9 +105,9 @@ export default function Cart() {
                     <QuantityControl item={item} />
                     <button
                       onClick={() => removeFromCart(item._id)}
-                      className="text-red-500 hover:text-red-700 text-sm font-semibold flex items-center gap-1 transition"
+                      className="text-slate-400 hover:text-red-600 text-[11px] font-bold flex items-center gap-1 transition-colors uppercase tracking-wider"
                     >
-                      <span className="text-lg">✕</span> Unselect
+                      <span className="text-sm">✕</span> Remove
                     </button>
                   </div>
                 </div>

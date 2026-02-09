@@ -20,3 +20,21 @@ export const authMiddleware = async (req, res, next) => {
     res.status(401).json({ message: "Token is not valid" });
   }
 };
+// Middleware to check JWT token (Optional - allows guest access)
+export const optionalAuth = async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    req.user = null;
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select("-password");
+    next();
+  } catch (error) {
+    // If token is invalid, we still treat as guest but log it
+    req.user = null;
+    next();
+  }
+};

@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser, loginUser, getMe, updateProfile } from "../controllers/authController.js";
+import { registerUser, loginUser, getMe, updateProfile, forgotPassword, resetPassword, deleteMe } from "../controllers/authController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -19,5 +19,17 @@ router.get("/me", authMiddleware, getMe);
 // @route   PUT /api/auth/profile
 // @desc    Update user profile
 router.put("/profile", authMiddleware, updateProfile);
+
+// @route   POST /api/auth/forgot-password
+// @desc    Forgot password
+router.post("/forgot-password", forgotPassword);
+
+// @route   PUT /api/auth/reset-password/:token
+// @desc    Reset password
+router.put("/reset-password/:token", resetPassword);
+
+// @route   DELETE /api/auth/me
+// @desc    Delete current user account
+router.delete("/me", authMiddleware, deleteMe);
 
 export default router;

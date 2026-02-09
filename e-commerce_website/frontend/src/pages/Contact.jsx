@@ -7,11 +7,17 @@ import { useAuth } from "../hooks/useAuth";
 export default function Contact() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    message: ""
-  });
+  const [notification, setNotification] = useState(null);
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const showNotification = (msg, type = "error") => {
+    setNotification({ msg, type });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (type === "success") {
+      setTimeout(() => setNotification(null), 6000);
+    } else {
+      setTimeout(() => setNotification(null), 5000);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -31,8 +37,8 @@ export default function Contact() {
     e.preventDefault();
 
     if (!user) {
-      alert("Please login to send a message.");
-      navigate("/login");
+      showNotification("Please sign in to send a message.");
+      setTimeout(() => navigate("/login"), 1500);
       return;
     }
 
@@ -47,21 +53,31 @@ export default function Contact() {
     const messageErr = validateMessage(trimmed.message);
     if (messageErr) errors.push(messageErr);
     if (errors.length > 0) {
-      alert("Please correct the following:\n\n• " + errors.join("\n• "));
+      showNotification("Please correct the form fields.");
       return;
     }
     try {
       await sendComment(trimmed);
-      alert("thank you, message is sent");
+      showNotification("Thank you! Your message has been sent successfully.", "success");
       setForm({ name: user.fullName || "", email: user.email, message: "" });
     } catch (err) {
-      alert("Failed to send message. Please try again.");
+      showNotification("Failed to send message. Please try again.");
       console.error(err);
     }
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto animate-fadeIn">
+    <div className="p-6 max-w-lg mx-auto animate-fadeIn relative">
+      {/* Notification Banner */}
+      {notification && (
+        <div className={`mb-6 p-4 rounded-2xl border animate-slideDown flex items-center gap-3 shadow-sm ${notification.type === "success"
+          ? "bg-emerald-50 border-emerald-100 text-emerald-800"
+          : "bg-rose-50 border-rose-100 text-rose-800"
+          }`}>
+          <span className="text-xl">{notification.type === "success" ? "✅" : "⚠️"}</span>
+          <p className="font-bold text-sm tracking-tight">{notification.msg}</p>
+        </div>
+      )}
       {/* 1. Physical address, 2. Phone number, 3. Email - per scenario */}
       <section className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
         <h3 className="text-lg font-bold mb-4 text-gray-800">Reach us</h3>

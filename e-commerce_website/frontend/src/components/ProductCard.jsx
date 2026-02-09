@@ -15,13 +15,12 @@ export default function ProductCard({ product, onDelete }) {
   const isNew = product.createdAt && (new Date() - new Date(product.createdAt)) / (1000 * 60 * 60 * 24) < 7;
 
   const handleAddToCart = () => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
     addToCart(product, qty);
     setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    setTimeout(() => {
+      setAdded(false);
+      navigate("/cart");
+    }, 500);
   };
 
   return (
@@ -56,21 +55,20 @@ export default function ProductCard({ product, onDelete }) {
       <p className="text-gray-600 text-sm line-clamp-2 flex-1 mt-1">{product.description}</p>
       <p className="font-bold mt-2 text-indigo-600">{Number(product.price).toFixed(2)} ETB</p>
 
-      {user && (
-        <div className="flex items-center mt-3 gap-1">
-          <button onClick={() => setQty(qty > 1 ? qty - 1 : 1)} className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">
-            −
-          </button>
-          <span className="mx-2 min-w-[1.5rem] text-center font-medium">{qty}</span>
-          <button
-            onClick={() => setQty(qty < product.stock ? qty + 1 : qty)}
-            disabled={qty >= product.stock}
-            className={`px-2.5 py-1 rounded-lg font-medium transition ${qty >= product.stock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-100 hover:bg-gray-200'}`}
-          >
-            +
-          </button>
-        </div>
-      )}
+      {/* Qty Controls (Always Visible) */}
+      <div className="flex items-center mt-3 gap-1">
+        <button onClick={() => setQty(qty > 1 ? qty - 1 : 1)} className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">
+          −
+        </button>
+        <span className="mx-2 min-w-[1.5rem] text-center font-medium">{qty}</span>
+        <button
+          onClick={() => setQty(qty < product.stock ? qty + 1 : qty)}
+          disabled={qty >= product.stock}
+          className={`px-2.5 py-1 rounded-lg font-medium transition ${qty >= product.stock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-100 hover:bg-gray-200'}`}
+        >
+          +
+        </button>
+      </div>
 
       <button
         onClick={handleAddToCart}

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   products: [
     {
       product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
@@ -17,6 +17,7 @@ const orderSchema = new mongoose.Schema({
   },
   receiptImage: { type: String }, // uploaded by user
   paymentRef: { type: String }, // Chapa Transaction Reference
+  paymentMethod: { type: String, enum: ["transfer", "cod"], default: "transfer" },
   status: {
     type: String,
     enum: ["pending", "pending_payment", "verified", "shipped", "delivered", "cancelled", "refunded", "receipt_rejected"],

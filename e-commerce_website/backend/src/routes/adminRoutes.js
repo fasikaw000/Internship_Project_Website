@@ -7,6 +7,8 @@ import {
   commitTransaction,
   requestReceiptResubmission,
   toggleUserSuspension,
+  updateUserRole,
+  deleteUser,
 } from "../controllers/adminController.js";
 import { getAuditLogs } from "../controllers/auditController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
@@ -45,5 +47,13 @@ router.put("/order/:id/commit", authMiddleware, adminMiddleware, commitTransacti
 // @route   POST /api/admin/order/:id/resubmit-receipt
 // @desc    Request receipt resubmission (Admin)
 router.post("/order/:id/resubmit-receipt", authMiddleware, adminMiddleware, requestReceiptResubmission);
+
+// @route   PUT /api/admin/users/:id/role
+// @desc    Update user role (Admin)
+router.put("/users/:id/role", authMiddleware, adminMiddleware, updateUserRole);
+
+// @route   DELETE /api/admin/users/:id
+// @desc    Delete a user (Admin)
+router.delete("/users/:id", authMiddleware, adminMiddleware, deleteUser);
 
 export default router;

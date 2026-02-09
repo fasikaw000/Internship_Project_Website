@@ -68,17 +68,57 @@ export const createOrder = asyncHandler(async (req, res) => {
     receiptImage = req.file.filename;
   }
 
+  const paymentMethod = req.body.paymentMethod || (receiptImage ? "transfer" : "cod");
   const tx_ref = `tx-${Date.now()}`;
 
   const order = await Order.create({
-    user: req.user._id,
+    user: req.user?._id || null, // null for guests
     products,
     totalPrice,
     deliveryInfo,
-    paymentRef: receiptImage ? null : tx_ref, // Use tx_ref only if using Chapa (no receipt)
+    paymentMethod,
+    paymentRef: (paymentMethod === "transfer" && !receiptImage) ? tx_ref : null,
     receiptImage: receiptImage,
-    status: receiptImage ? "pending_payment" : "pending_payment",
-    statusHistory: [{ status: "pending_payment", comment: "Order placed. Waiting for verification." }],
+    status: paymentMethod === "cod" ? "pending" : "pending_payment",
+    statusHistory: [{
+      status: paymentMethod === "cod" ? "pending" : "pending_payment",
+      comment: paymentMethod === "cod" ? "Order placed via Cash on Delivery." : "Order placed via Bank Transfer. Waiting for verification."
+    }],
+  });
+
+  // EMAIL NOTIFICATIONS
+  const emailContent = `
+    <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 12px; max-width: 600px; margin: auto;">
+      <h2 style="color: #4f46e5; border-bottom: 2px solid #4f46e5; padding-bottom: 10px;">New Order Received!</h2>
+      <p>Hi <strong>${deliveryInfo.name}</strong>, thank you for your order!</p>
+      <div style="background: #f8fafc; padding: 15px; rounded: 8px; margin: 20px 0;">
+        <p style="margin: 0;"><strong>Order ID:</strong> #${order._id.toString().toUpperCase()}</p>
+        <p style="margin: 5px 0 0 0;"><strong>Total Amount:</strong> ${totalPrice.toFixed(2)} ETB</p>
+        <p style="margin: 5px 0 0 0;"><strong>Payment Method:</strong> ${paymentMethod.toUpperCase()}</p>
+        ${!req.user ? '<p style="margin: 5px 0 0 0; color: #6366f1;"><strong>Guest Checkout Used</strong></p>' : ""}
+      </div>
+      <p>We are currently processing your order. ${req.user ? "You can track your status in your account dashboard." : "Please save this order ID for tracking your package."}</p>
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+      <p style="font-size: 12px; color: #64748b; text-align: center;">This is an automated receipt from MICHU GEBEYA.</p>
+    </div>
+  `;
+
+  // Send to User
+  await sendMail({
+    to: deliveryInfo.email || req.user?.email,
+    subject: `Order Confirmation - #${order._id.toString().slice(-6).toUpperCase()}`,
+    html: emailContent,
+  });
+
+  // Send to Admin
+  await sendMail({
+    to: process.env.ADMIN_EMAIL,
+    subject: `🚀 New Order Alert: #${order._id.toString().slice(-6).toUpperCase()}`,
+    html: `<h3>New Order Received</h3>
+           <p><strong>Customer:</strong> ${deliveryInfo.name} (${deliveryInfo.email})</p>
+           <p><strong>Method:</strong> ${paymentMethod.toUpperCase()}</p>
+           <p><strong>Total:</strong> ${totalPrice.toFixed(2)} ETB</p>
+           <p>Please log in to the admin dashboard to review.</p>`,
   });
 
   // If we have a receipt, we are done. Return success.

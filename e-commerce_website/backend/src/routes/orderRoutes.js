@@ -7,7 +7,7 @@ import {
   resubmitReceipt,
   cancelOrder,
 } from "../controllers/orderController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { authMiddleware, optionalAuth } from "../middleware/authMiddleware.js";
 import { adminMiddleware } from "../middleware/adminMiddleware.js";
 import { upload } from "../middleware/uploadMiddleware.js";
 
@@ -15,7 +15,7 @@ const router = express.Router();
 
 // @route   POST /api/orders
 // @desc    Create new order (User)
-router.post("/", authMiddleware, upload.single("receiptImage"), createOrder);
+router.post("/", optionalAuth, upload.single("receiptImage"), createOrder);
 
 // @route   GET /api/orders/me
 // @desc    Get orders of logged-in user

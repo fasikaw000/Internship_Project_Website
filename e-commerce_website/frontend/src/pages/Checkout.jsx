@@ -21,8 +21,21 @@ export default function Checkout() {
     email: user?.email || "",
     address: "",
   });
+  const [paymentMethod, setPaymentMethod] = useState("transfer");
   const [receipt, setReceipt] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (msg, type = "error") => {
+    setNotification({ msg, type });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (type === "success") {
+      // Stay longer if success
+      setTimeout(() => setNotification(null), 6000);
+    } else {
+      setTimeout(() => setNotification(null), 5000);
+    }
+  };
 
   useEffect(() => {
     const fetchBank = async () => {
@@ -49,7 +62,7 @@ export default function Checkout() {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (!cart.length) {
-      alert("Your cart is empty. Add products first.");
+      showNotification("Your cart is empty. Add products first.");
       return;
     }
     const trimmed = {
@@ -68,104 +81,148 @@ export default function Checkout() {
     const addressErr = validateAddressAddisAbaba(trimmed.address);
     if (addressErr) errors.push(addressErr);
 
-    if (!receipt) {
-      errors.push("Please upload the payment receipt.");
+    if (paymentMethod === "transfer" && !receipt) {
+      errors.push("Please upload the payment receipt for bank transfer.");
     }
 
     if (errors.length > 0) {
-      alert("Please complete all required fields:\n\n• " + errors.join("\n• "));
+      showNotification("Please check the form: " + errors[0]);
       return;
     }
     setLoading(true);
     try {
       const formData = new FormData();
       formData.append("deliveryInfo", JSON.stringify(trimmed));
-      formData.append("receiptImage", receipt);
-      // Products are handled by backend from cart or we send them?
-      // Check orderService/backend: usually backend might take products from body or we send them.
-      // Looking at `placeOrder` in orderService, it sends `formData`.
-      // Backend usually expects `products` in body or creates from User's cart if stored in DB?
-      // Let's assume we need to send products array as JSON string if backend expects it in FormData
-      // PREVIOUS LOGIC (from memory/inference): It likely sent product IDs.
-      // SAFE BET: Send products array.
+      formData.append("paymentMethod", paymentMethod);
+      if (receipt) formData.append("receiptImage", receipt);
       formData.append("products", JSON.stringify(cart.map((item) => ({ product: item._id, quantity: item.quantity }))));
 
       await placeOrder(formData);
 
-      alert("Order placed successfully! We will verify your receipt and update the status.");
+      showNotification(paymentMethod === "cod"
+        ? "Order placed! We will contact you soon for delivery."
+        : "Order placed successfully! We will verify your receipt and update the status.", "success");
+
       clearCart();
-      navigate("/orders");
+      setTimeout(() => navigate("/orders"), 2000);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to place order. Please try again.");
+      showNotification(err.response?.data?.message || "Failed to place order. Please try again.");
       console.error(err);
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto animate-fadeIn">
-
-
-      {/* Bank Info Section */}
-      <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded text-center">
-        <p className="font-bold text-indigo-900">Bank Transfer Details</p>
-        <p className="text-sm text-indigo-700 mb-2">Please transfer the total amount to:</p>
-        <div className="bg-white p-3 rounded shadow-sm inline-block text-left">
-          <p className="text-gray-600 text-sm">Bank: <span className="font-bold text-gray-800">CBE (Commercial Bank of Ethiopia)</span></p>
-          <p className="text-gray-600 text-sm">Account Name: <span className="font-bold text-gray-800">{bank.fullName || "Loading..."}</span></p>
-          <p className="text-gray-600 text-sm">Account Number: <span className="font-mono font-bold text-indigo-600 text-lg">{bank.accountNumber || "Wait..."}</span></p>
+    <div className="p-6 max-w-lg mx-auto animate-fadeIn relative">
+      {/* Notification Banner */}
+      {notification && (
+        <div className={`mb-6 p-4 rounded-2xl border animate-slideDown flex items-center gap-3 shadow-sm ${notification.type === "success"
+            ? "bg-emerald-50 border-emerald-100 text-emerald-800"
+            : "bg-rose-50 border-rose-100 text-rose-800"
+          }`}>
+          <span className="text-xl">{notification.type === "success" ? "✅" : "⚠️"}</span>
+          <p className="font-bold text-sm tracking-tight">{notification.msg}</p>
         </div>
-        <p className="text-xs text-indigo-500 mt-2">Upload the receipt screenshot below after transfer.</p>
+      )}
+      <h2 className="text-2xl font-black text-slate-800 mb-6 text-center tracking-tight">Checkout</h2>
+
+      {/* Payment Method Selector */}
+      <div className="mb-6 grid grid-cols-2 gap-4">
+        <button
+          onClick={() => setPaymentMethod("transfer")}
+          className={`p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center gap-2 ${paymentMethod === "transfer" ? "border-indigo-600 bg-indigo-50 shadow-md" : "border-slate-200 bg-white hover:border-indigo-300"}`}
+        >
+          <div className={`p-2 rounded-full ${paymentMethod === "transfer" ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+          </div>
+          <span className="text-sm font-bold uppercase tracking-wider">Bank Transfer</span>
+        </button>
+        <button
+          onClick={() => setPaymentMethod("cod")}
+          className={`p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center gap-2 ${paymentMethod === "cod" ? "border-indigo-600 bg-indigo-50 shadow-md" : "border-slate-200 bg-white hover:border-indigo-300"}`}
+        >
+          <div className={`p-2 rounded-full ${paymentMethod === "cod" ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <span className="text-sm font-bold uppercase tracking-wider">Cash on Delivery</span>
+        </button>
       </div>
 
-      <form onSubmit={submitHandler} className="space-y-3">
-        <input
-          className="border border-gray-300 w-full p-2 rounded"
-          placeholder="Full name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          required
-        />
-        <input
-          className="border border-gray-300 w-full p-2 rounded"
-          placeholder="Ethiopian phone (e.g. 0911123456 or +251911123456)"
-          value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          required
-        />
-        <input
-          type="email"
-          className={`border border-gray-300 w-full p-2 rounded ${user ? "bg-gray-100 text-gray-500 cursor-not-allowed" : ""}`}
-          placeholder="Email"
-          value={form.email}
-          readOnly={!!user}
-          onChange={(e) => !user && setForm({ ...form, email: e.target.value })}
-          title={user ? "Email must match your login email" : ""}
-          required
-        />
-        <input
-          className="border border-gray-300 w-full p-2 rounded"
-          placeholder="Address in Addis Ababa, Ethiopia"
-          value={form.address}
-          onChange={(e) => setForm({ ...form, address: e.target.value })}
-          required
-        />
+      {/* Bank Info Section (Conditional) */}
+      {paymentMethod === "transfer" && (
+        <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-2xl text-center animate-slideDown">
+          <p className="font-bold text-indigo-900 mb-3 uppercase text-xs tracking-widest">Bank Transfer Details</p>
+          <div className="bg-white p-4 rounded-xl shadow-sm inline-block text-left border border-indigo-100">
+            <p className="text-slate-500 text-xs font-bold uppercase mb-1 opacity-50">CBE Account</p>
+            <p className="text-slate-700 text-sm font-bold mb-1">{bank.fullName || "Loading..."}</p>
+            <p className="font-mono font-black text-indigo-600 text-xl tracking-tighter">{bank.accountNumber || "Wait..."}</p>
+          </div>
+          <p className="text-[10px] text-indigo-400 mt-4 font-medium">Please upload the receipt screenshot below after transfer.</p>
+        </div>
+      )}
 
-        <div className="border border-dashed border-indigo-300 bg-indigo-50/50 p-4 rounded-xl text-center">
-          <label className="block text-indigo-900 font-bold text-sm mb-2">Upload Payment Receipt</label>
+      {paymentMethod === "cod" && (
+        <div className="mb-6 p-6 bg-teal-50 border border-teal-200 rounded-2xl text-center animate-slideDown">
+          <p className="text-xs text-teal-600 font-bold leading-relaxed">You will pay the total amount directly to our delivery person when you receive your package.</p>
+        </div>
+      )}
+
+      <form onSubmit={submitHandler} className="space-y-4">
+        <div className="space-y-3">
           <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setReceipt(e.target.files[0])}
-            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            placeholder="Recipient Full Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
           />
+          <input
+            className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            placeholder="Ethiopian phone (e.g. 0911123456)"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            required
+          />
+          <input
+            type="email"
+            className={`appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition ${user ? "bg-slate-50 text-slate-400 cursor-not-allowed" : ""}`}
+            placeholder="Email Address"
+            value={form.email}
+            readOnly={!!user}
+            onChange={(e) => !user && setForm({ ...form, email: e.target.value })}
+            required
+          />
+          <textarea
+            className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            placeholder="Address (Addis Ababa, Ethiopia)"
+            rows="3"
+            value={form.address}
+            onChange={(e) => setForm({ ...form, address: e.target.value })}
+            required
+          ></textarea>
         </div>
+
+        {paymentMethod === "transfer" && (
+          <div className="border border-dashed border-indigo-300 bg-indigo-50/30 p-5 rounded-2xl text-center animate-slideDown">
+            <label className="block text-indigo-900 font-black text-[10px] uppercase tracking-widest mb-3">Upload Payment Receipt</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setReceipt(e.target.files[0])}
+              className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 transition"
+              required={paymentMethod === "transfer"}
+            />
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition flex justify-center items-center gap-2"
+          className="w-full bg-indigo-600 text-white px-4 py-4 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 transition-all duration-300 transform active:scale-95 flex justify-center items-center gap-2 mt-4"
         >
           {loading ? "Processing..." : "Place Order"}
         </button>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import api from "../../services/api";
 
 const CATEGORIES = ["all", "electronics", "fashions", "books"];
+const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5001/api").replace("/api", "");
 
 export default function ManageProducts() {
   const [products, setProducts] = useState([]);
@@ -15,10 +16,16 @@ export default function ManageProducts() {
     stock: "",
   });
   const [imageFile, setImageFile] = useState(null);
+  const [notification, setNotification] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // { id: string, name: string, force: boolean }
   const [loading, setLoading] = useState(false);
   const imageInputRef = useRef(null);
 
-  const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5001/api").replace("/api", "");
+  const showNotification = (msg, type = "error") => {
+    setNotification({ msg, type });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => setNotification(null), 5000);
+  };
 
   const loadProducts = async () => {
     const res = await api.get("/products");
@@ -68,7 +75,7 @@ export default function ManageProducts() {
       !form.description.trim() ||
       (!editingId && !imageFile)
     ) {
-      alert("Please fill all fields " + (!editingId ? "including an image." : "(If updating, name/category/price/stock/description are required)."));
+      showNotification("Please fill all required fields correctly.");
       return;
     }
 
@@ -86,82 +93,103 @@ export default function ManageProducts() {
         await api.put(`/products/${editingId}`, body, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        alert("✅ Product updated successfully!");
+        showNotification("Product updated successfully!", "success");
       } else {
         await api.post("/products", body, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        alert("✅ Product added successfully!");
+        showNotification("Product added successfully!", "success");
       }
 
       cancelEdit();
       await loadProducts();
     } catch (err) {
       const msg = err.response?.data?.message || err.message || "Something went wrong";
-      alert(`❌ Failed to ${editingId ? "update" : "add"} product: ${msg}`);
+      showNotification(`Failed to ${editingId ? "update" : "add"} product: ${msg}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const deleteProduct = async (id) => {
-    // 1. Standard Professional Confirmation
-    const primaryConfirm = confirm(
-      "Are you sure you want to delete this product? This action cannot be undone."
-    );
-    if (!primaryConfirm) return;
+  const confirmDelete = (product) => {
+    setDeleteConfirm({ id: product._id, name: product.name, force: false, isActive: false });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
+  const executeDelete = async () => {
+    const { id, force } = deleteConfirm;
+    setLoading(true);
     try {
-      await api.delete(`/products/${id}`);
-
-      // Success Alert
-      alert(
-        "✅ Product deleted successfully.\n\n" +
-        "The product has been removed from the catalog."
-      );
+      await api.delete(`/products/${id}${force ? "?force=true" : ""}`);
+      showNotification("Product deleted successfully.", "success");
+      setDeleteConfirm(null);
       loadProducts();
     } catch (err) {
       const data = err.response?.data;
-
-      // Check if product is linked to ACTIVE orders - Hard Block
-      if (data?.isLinked && data?.isActive) {
-        alert(
-          "❌ This product cannot be deleted because it is linked to active orders.\n\nPlease try again later."
-        );
-        return;
+      if (data?.isLinked) {
+        setDeleteConfirm({ ...deleteConfirm, isLinked: true, isActive: data.isActive });
+      } else {
+        showNotification("Failed to delete product. Please try again.");
+        setDeleteConfirm(null);
       }
-
-      // Check if product is linked to OTHER orders - Warning / Force Option
-      if (data?.isLinked && !data?.isActive) {
-        const secondaryConfirm = confirm(
-          "This product is associated with existing orders. Deleting it may affect order records. Continue?"
-        );
-        if (secondaryConfirm) {
-          try {
-            await api.delete(`/products/${id}?force=true`);
-            alert(
-              "✅ Product deleted successfully.\n\n" +
-              "The product has been removed from the catalog."
-            );
-            loadProducts();
-          } catch (forceErr) {
-            alert("❌ Please try again later.");
-          }
-        }
-        return;
-      }
-
-      // Generic Error Alert
-      alert("❌ Please try again later.");
-      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto relative min-h-screen">
       <div className="mb-4">
         <Link to="/admin" className="text-indigo-600 hover:underline text-sm font-semibold italic">← Back to Dashboard</Link>
       </div>
+
+      {/* Notification Banner */}
+      {notification && (
+        <div className={`mb-6 p-4 rounded-2xl border animate-slideDown flex items-center gap-3 shadow-sm ${notification.type === "success"
+          ? "bg-emerald-50 border-emerald-100 text-emerald-800"
+          : "bg-rose-50 border-rose-100 text-rose-800"
+          }`}>
+          <span className="text-xl">{notification.type === "success" ? "✅" : "⚠️"}</span>
+          <p className="font-bold text-sm tracking-tight">{notification.msg}</p>
+        </div>
+      )}
+
+      {/* Deletion Confirmation Modal/UI */}
+      {deleteConfirm && (
+        <div className="mb-8 p-6 bg-rose-50 border border-rose-100 rounded-2xl animate-fadeIn text-center shadow-lg shadow-rose-100">
+          <p className="text-rose-900 font-black mb-1 uppercase tracking-widest text-xs">⚠ Critical Action</p>
+          <p className="text-rose-800 text-sm mb-4">
+            {deleteConfirm.isLinked
+              ? deleteConfirm.isActive
+                ? `Cannot delete "${deleteConfirm.name}" because it is linked to active orders.`
+                : `"${deleteConfirm.name}" is associated with past orders. Deleting it may affect records. Proceed?`
+              : `Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`
+            }
+          </p>
+          <div className="flex justify-center gap-4">
+            {!(deleteConfirm.isLinked && deleteConfirm.isActive) && (
+              <button
+                onClick={() => {
+                  if (deleteConfirm.isLinked) setDeleteConfirm({ ...deleteConfirm, force: true });
+                  executeDelete();
+                }}
+                disabled={loading}
+                className="px-6 py-2 bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700 transition shadow-lg"
+              >
+                {loading ? "Processing..." : "Confirm Delete"}
+              </button>
+            )}
+            <button
+              onClick={() => setDeleteConfirm(null)}
+              disabled={loading}
+              className="px-6 py-2 bg-white text-slate-600 font-bold rounded-lg hover:bg-slate-50 transition border border-slate-200"
+            >
+              {deleteConfirm.isLinked && deleteConfirm.isActive ? "Close" : "Cancel"}
+            </button>
+          </div>
+        </div>
+      )}
+
       <h2 className="text-2xl font-extrabold mb-6 text-slate-900 tracking-tight">
         {editingId ? "Edit Product" : "Manage Products"}
       </h2>
@@ -291,7 +319,7 @@ export default function ManageProducts() {
                   Edit
                 </button>
                 <button
-                  onClick={() => deleteProduct(p._id)}
+                  onClick={() => confirmDelete(p)}
                   className="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-red-100 transition whitespace-nowrap"
                 >
                   Delete

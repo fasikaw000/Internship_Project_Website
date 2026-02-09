@@ -9,6 +9,7 @@ export default function DeleteProduct() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState("");
     const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
@@ -27,12 +28,14 @@ export default function DeleteProduct() {
 
     const handleDelete = async () => {
         setDeleting(true);
+        setSuccess("");
+        setError(null);
         try {
             await deleteProduct(id);
-            alert("Product deleted successfully.");
-            navigate("/products");
+            setSuccess("Product deleted successfully. Redirecting...");
+            setTimeout(() => navigate("/products"), 2000);
         } catch (err) {
-            alert("Failed to delete product.");
+            setError(err.response?.data?.message || "Failed to delete product.");
             setDeleting(false);
         }
     };
@@ -46,6 +49,9 @@ export default function DeleteProduct() {
                 🗑️
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Delete Product?</h2>
+            {success && <div className="mb-4 p-3 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-lg text-sm font-bold animate-fadeIn">✅ {success}</div>}
+            {error && <div className="mb-4 p-3 bg-red-50 border border-red-100 text-red-600 rounded-lg text-sm font-bold animate-shake">❌ {error}</div>}
+
             <p className="text-slate-600 mb-6">
                 Are you sure you want to delete <span className="font-bold text-slate-900">"{product.name}"</span>?
                 This action cannot be undone.

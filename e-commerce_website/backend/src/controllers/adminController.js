@@ -7,6 +7,17 @@ import { logAction } from "./auditController.js";
 
 // Get dashboard stats (Admin)
 export const getStats = asyncHandler(async (req, res) => {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const startOfWeek = new Date();
+  startOfWeek.setDate(startOfWeek.getDate() - 7);
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const startOfMonth = new Date();
+  startOfMonth.setMonth(startOfMonth.getMonth() - 1);
+  startOfMonth.setHours(0, 0, 0, 0);
+
   const [users, products, orders] = await Promise.all([
     User.countDocuments(),
     Product.countDocuments(),
@@ -20,10 +31,55 @@ export const getStats = asyncHandler(async (req, res) => {
   ]);
   const totalRevenue = revenueResult[0]?.total || 0;
 
-  // Low Stock Products
-  const lowStockProducts = await Product.find({ stock: { $lt: 5 } }).select("name stock");
+  // Calculate Today's Revenue
+  const todayRevenueResult = await Order.aggregate([
+    {
+      $match: {
+        status: { $in: ["verified", "delivered", "completed"] },
+        createdAt: { $gte: startOfToday }
+      }
+    },
+    { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+  ]);
+  const todayRevenue = todayRevenueResult[0]?.total || 0;
 
-  res.json({ users, products, orders, totalRevenue, lowStockProducts });
+  // Calculate Weekly Revenue
+  const weeklyRevenueResult = await Order.aggregate([
+    {
+      $match: {
+        status: { $in: ["verified", "delivered", "completed"] },
+        createdAt: { $gte: startOfWeek }
+      }
+    },
+    { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+  ]);
+  const weeklyRevenue = weeklyRevenueResult[0]?.total || 0;
+
+  // Calculate Monthly Revenue
+  const monthlyRevenueResult = await Order.aggregate([
+    {
+      $match: {
+        status: { $in: ["verified", "delivered", "completed"] },
+        createdAt: { $gte: startOfMonth }
+      }
+    },
+    { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+  ]);
+  const monthlyRevenue = monthlyRevenueResult[0]?.total || 0;
+
+  // Low Stock Products
+  const lowStockProducts = await Product.find({ stock: { $lt: 5 }, isDeleted: { $ne: true } }).select("name stock");
+
+  res.json({
+    users,
+    products,
+    orders,
+    totalRevenue,
+    monthlyRevenue,
+    weeklyRevenue,
+    dailyRevenue: todayRevenue,
+    lowStockProducts
+  });
 });
 
 // Get all users/customers (Admin)
@@ -122,4 +178,65 @@ export const requestReceiptResubmission = asyncHandler(async (req, res) => {
   });
 
   res.json({ message: "Receipt resubmission requested and email sent", order });
+});
+// Promote/Demote User Role (Admin)
+export const updateUserRole = asyncHandler(async (req, res) => {
+  const { role } = req.body;
+  const user = await User.findById(req.params.id);
+
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  // Safeguard: Cannot demote self
+  if (user._id.toString() === req.user._id.toString()) {
+    return res.status(400).json({ message: "You cannot change your own role." });
+  }
+
+  if (!["user", "admin"].includes(role)) {
+    return res.status(400).json({ message: "Invalid role" });
+  }
+
+  const oldRole = user.role;
+  user.role = role;
+  await user.save();
+
+  // Log the action
+  await logAction(
+    req.user._id,
+    "UPDATE_USER_ROLE",
+    `User: ${user.email} from ${oldRole} to ${role}`,
+    { oldRole, newRole: role },
+    req.ip
+  );
+
+  res.json({ message: `User role updated to ${role}`, user });
+});
+
+// Delete User (Admin)
+export const deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  // Safeguard: Cannot delete self
+  if (user._id.toString() === req.user._id.toString()) {
+    return res.status(400).json({ message: "You cannot delete your own account." });
+  }
+
+  // Safeguard: Optional - restrict deleting other admins
+  if (user.role === "admin") {
+    return res.status(400).json({ message: "Cannot delete another administrator via this interface." });
+  }
+
+  await user.deleteOne();
+
+  // Log the action
+  await logAction(
+    req.user._id,
+    "DELETE_USER",
+    `User: ${user.email}`,
+    { email: user.email },
+    req.ip
+  );
+
+  res.json({ message: "User deleted successfully" });
 });

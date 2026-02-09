@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   validateFullName,
   validateUsername,
@@ -9,130 +9,168 @@ import {
 } from "../utils/validation";
 
 export default function Register() {
-  const [form, setForm] = useState({
-    fullName: "",
-    username: "",
-    email: "",
-    password: "",
-  });
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [notif, setNotif] = useState({ message: "", type: "" }); // { message: string, type: 'success' | 'error' }
+
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  const showNotification = (message, type = "error") => {
+    setNotif({ message, type });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (type === "success") {
+      setTimeout(() => setNotif({ message: "", type: "" }), 5000);
+    }
+  };
+
   const submitHandler = async (e) => {
     e.preventDefault();
+    setNotif({ message: "", type: "" });
+
+    const fullName = `${firstName} ${lastName}`.trim();
     const errors = [];
-    const fullNameErr = validateFullName(form.fullName);
+
+    const fullNameErr = validateFullName(fullName);
     if (fullNameErr) errors.push(fullNameErr);
-    const usernameErr = validateUsername(form.username);
-    if (usernameErr) errors.push(usernameErr);
-    const emailErr = validateEmail(form.email);
+
+    const emailErr = validateEmail(email);
     if (emailErr) errors.push(emailErr);
-    const passwordErr = validatePassword(form.password);
+
+    const passwordErr = validatePassword(password);
     if (passwordErr) errors.push(passwordErr);
+
     if (errors.length > 0) {
-      alert("Please correct the following:\n\n• " + errors.join("\n• "));
+      showNotification(errors[0]); // Show first error for brevity
       return;
     }
+
+    setLoading(true);
     try {
-      await register(form);
-      alert("Registered successfully, please login.");
-      navigate("/login");
+      await register({ fullName, email, password });
+      showNotification("Account created successfully! Redirecting to sign in...", "success");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed. Please try again.");
-      console.error(err);
+      showNotification(err.response?.data?.message || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={submitHandler} className="p-6 max-w-md mx-auto animate-fadeIn">
-      {Object.keys(form).map((key) => {
-        if (key === "password") {
-          return (
-            <div key={key} className="mb-3 relative">
+    <div className="min-h-screen flex flex-col justify-center py-12 px-6 lg:px-8 bg-slate-50">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="text-center text-3xl font-extrabold text-slate-900 tracking-tight">
+          Create your account
+        </h2>
+        <p className="mt-2 text-center text-sm text-slate-600">
+          Already have an account?{" "}
+          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+            Sign in
+          </Link>
+        </p>
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow-xl shadow-slate-200/50 rounded-2xl border border-slate-100 sm:px-10">
+
+          {notif.message && (
+            <div className={`mb-6 p-4 rounded-xl border text-sm font-medium flex items-center shadow-sm animate-slideDown ${notif.type === "success"
+              ? "bg-green-50 border-green-100 text-green-700"
+              : "bg-red-50 border-red-100 text-red-700"
+              }`}>
+              <span className="mr-2">{notif.type === "success" ? "✓" : "⚠"}</span>
+              {notif.message}
+            </div>
+          )}
+
+          <form onSubmit={submitHandler} className="space-y-5">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">First Name</label>
+                <input
+                  type="text"
+                  required
+                  className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Last Name</label>
+                <input
+                  type="text"
+                  required
+                  className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Email address</label>
               <input
-                className="border border-gray-300 w-full p-2 pr-10 rounded"
-                placeholder="Password (min 6 characters)"
-                type={showPassword ? "text" : "password"}
-                value={form.password}
-                onChange={(e) =>
-                  setForm({ ...form, password: e.target.value })
-                }
+                type="email"
                 required
-                minLength={6}
+                className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition pr-12"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-600 transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div>
               <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                type="submit"
+                disabled={loading}
+                className={`w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-sm font-black text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform active:scale-95 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
               >
-                {showPassword ? (
-                  // Eye off icon with forward slash
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  >
-                    {/* eye outline */}
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 12C3.75 7.5 7.5 4.5 12 4.5s8.25 3 9.75 7.5c-1.5 4.5-5.25 7.5-9.75 7.5S3.75 16.5 2.25 12z"
-                    />
-                    {/* forward slash (top-right to bottom-left) */}
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M18 6L6 18"
-                    />
+                {loading ? (
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                ) : (
-                  // Eye icon
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 12C3.75 7.5 7.5 4.5 12 4.5s8.25 3 9.75 7.5c-1.5 4.5-5.25 7.5-9.75 7.5S3.75 16.5 2.25 12z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"
-                    />
-                  </svg>
-                )}
+                ) : "Create Account"}
               </button>
             </div>
-          );
-        }
+          </form>
 
-        const labels = { fullName: "Full name", username: "Username", email: "Email" };
-        return (
-          <input
-            key={key}
-            type={key === "email" ? "email" : "text"}
-            className="border border-gray-300 w-full p-2 mb-3 rounded"
-            placeholder={labels[key] || key}
-            value={form[key]}
-            onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-            required
-          />
-        );
-      })}
-      <button className="bg-indigo-600 text-white px-4 py-2">
-        Register
-      </button>
-    </form>
+        </div>
+      </div>
+    </div>
   );
 }
