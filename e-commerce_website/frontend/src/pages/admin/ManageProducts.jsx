@@ -62,20 +62,28 @@ export default function ManageProducts() {
     const price = parseFloat(form.price);
     const stock = parseInt(form.stock, 10);
 
-    if (
-      !form.name.trim() ||
-      !form.category ||
-      form.category === "all" ||
-      form.price === "" ||
-      isNaN(price) ||
-      price <= 0 ||
-      form.stock === "" ||
-      isNaN(stock) ||
-      stock < 0 ||
-      !form.description.trim() ||
-      (!editingId && !imageFile)
-    ) {
-      showNotification("Please fill all required fields correctly.");
+    if (!form.name.trim()) {
+      showNotification("Product name is required.");
+      return;
+    }
+    if (!form.category || form.category === "all") {
+      showNotification("Please select a valid category.");
+      return;
+    }
+    if (form.price === "" || isNaN(price) || price <= 0) {
+      showNotification("Please enter a valid price greater than 0.");
+      return;
+    }
+    if (form.stock === "" || isNaN(stock) || stock < 0) {
+      showNotification("Please enter a valid stock count (0 or more).");
+      return;
+    }
+    if (!form.description.trim()) {
+      showNotification("Product description is required.");
+      return;
+    }
+    if (!editingId && !imageFile) {
+      showNotification("Please upload a product image.");
       return;
     }
 
@@ -296,7 +304,7 @@ export default function ManageProducts() {
       ) : (
         <div className="space-y-3">
           {products.map((p) => (
-            <div key={p._id} className="flex justify-between items-center gap-4 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition group">
+            <div key={p._id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition group">
               <div className="flex items-center gap-4 min-w-0">
                 <div className="h-16 w-16 bg-slate-50 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100 grayscale-[0.5] group-hover:grayscale-0 transition duration-500">
                   {p.image ? (

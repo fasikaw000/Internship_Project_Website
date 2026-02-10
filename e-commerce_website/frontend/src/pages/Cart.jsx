@@ -70,7 +70,7 @@ export default function Cart() {
         <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
           <p className="text-xl text-slate-400 font-medium mb-4">Your cart is currently empty.</p>
           <Link to="/products" className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold hover:bg-indigo-700 transition shadow-lg inline-block">
-            Start Shopping
+            Shop Now
           </Link>
         </div>
       ) : (
@@ -79,9 +79,9 @@ export default function Cart() {
           {/* Left Column: Cart Items */}
           <div className="lg:col-span-2 space-y-6">
             {cart.map((item) => (
-              <div key={item._id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex gap-4 items-center">
+              <div key={item._id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-4 items-center">
                 {/* Image */}
-                <div className="w-24 h-24 bg-slate-50 rounded-lg flex-shrink-0 flex items-center justify-center border border-slate-50">
+                <div className="w-full sm:w-24 h-24 bg-slate-50 rounded-lg flex-shrink-0 flex items-center justify-center border border-slate-50">
                   {item.image ? (
                     <img
                       src={`${API_BASE}/uploads/products/${item.image}`}
@@ -123,11 +123,11 @@ export default function Cart() {
               <div className="space-y-4 mb-6">
 
                 <div className="flex justify-between text-slate-600">
-                  <span>Shipping Estimate</span>
+                  <span className="text-sm font-medium">Delivery</span>
                   <span className="text-green-600 font-bold">Free</span>
                 </div>
                 <div className="border-t border-slate-200 pt-4 flex justify-between items-center">
-                  <span className="text-lg font-bold text-slate-900">Order Total</span>
+                  <span className="text-lg font-bold text-slate-900">Total</span>
                   <span className="text-2xl font-black text-indigo-900">{grandTotal.toFixed(2)} <span className="text-sm font-normal text-slate-500">ETB</span></span>
                 </div>
               </div>

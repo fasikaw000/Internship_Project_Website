@@ -1,6 +1,7 @@
 import Product from "../models/Product.js";
-import Order from "../models/Order.js";
+import Order from "../models/order.js";
 import { asyncHandler } from "../utils/errorHandler.js";
+import { logAction } from "./auditController.js";
 
 // Add a new product (Admin)
 export const addProduct = asyncHandler(async (req, res) => {
@@ -13,6 +14,16 @@ export const addProduct = asyncHandler(async (req, res) => {
     stock,
     image: req.file?.filename,
   });
+
+  // Log the action
+  await logAction(
+    req.user._id,
+    "ADD_PRODUCT",
+    `Product: ${product.name}`,
+    { name, category, price, stock },
+    req.ip
+  );
+
   res.status(201).json(product);
 });
 
@@ -31,6 +42,16 @@ export const updateProduct = asyncHandler(async (req, res) => {
   if (req.file) product.image = req.file.filename;
 
   await product.save();
+
+  // Log the action
+  await logAction(
+    req.user._id,
+    "UPDATE_PRODUCT",
+    `Product: ${product.name}`,
+    { name, category, price, stock, description },
+    req.ip
+  );
+
   res.json(product);
 });
 
@@ -67,6 +88,16 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   // Soft Delete
   product.isDeleted = true;
   await product.save();
+
+  // Log the action
+  await logAction(
+    req.user._id,
+    "DELETE_PRODUCT",
+    `Product: ${product.name}`,
+    { productId: product._id },
+    req.ip
+  );
+
   res.json({ message: "Product removed (Soft Delete)" });
 });
 

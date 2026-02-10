@@ -52,8 +52,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      await register({ fullName, email, password });
-      showNotification("Account created successfully! Redirecting to sign in...", "success");
+      showNotification("Account created successfully! Redirecting to login...", "success");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       showNotification(err.response?.data?.message || "Registration failed. Please try again.");
@@ -71,7 +70,7 @@ export default function Register() {
         <p className="mt-2 text-center text-sm text-slate-600">
           Already have an account?{" "}
           <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
-            Sign in
+            Login
           </Link>
         </p>
       </div>
@@ -114,7 +113,7 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Email address</label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Email</label>
               <input
                 type="email"
                 required

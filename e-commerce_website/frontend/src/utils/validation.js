@@ -26,7 +26,7 @@ export function validateUsername(value) {
 export function validateEmail(value) {
   const v = (value || "").trim();
   if (!v) return "Email is required.";
-  if (!EMAIL_REGEX.test(v)) return "Please enter a valid email address.";
+  if (!EMAIL_REGEX.test(v)) return "Please enter a valid email.";
   return null;
 }
 

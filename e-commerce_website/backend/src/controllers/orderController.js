@@ -1,14 +1,15 @@
-import Order from "../models/Order.js";
+import Order from "../models/order.js";
 import { asyncHandler } from "../utils/errorHandler.js";
 import Product from "../models/Product.js";
 import Coupon from "../models/Coupon.js";
 
 import { sendMail } from "../utils/sendMail.js";
 import { initializePayment } from "./paymentController.js";
+import { logAction } from "./auditController.js";
 
 // Create a new order
 export const createOrder = asyncHandler(async (req, res) => {
-  let { products, deliveryInfo } = req.body;
+  let { products, deliveryInfo, paymentMethod } = req.body;
   if (typeof products === "string") products = JSON.parse(products);
   if (typeof deliveryInfo === "string") deliveryInfo = JSON.parse(deliveryInfo);
 
@@ -68,20 +69,45 @@ export const createOrder = asyncHandler(async (req, res) => {
     receiptImage = req.file.filename;
   }
 
-  const paymentMethod = req.body.paymentMethod || (receiptImage ? "transfer" : "cod");
+  // Create a new order
   const tx_ref = `tx-${Date.now()}`;
 
+  // Guest Account Creation Logic
+  let userId = req.user?._id || null;
+  if (!userId && req.body.createAccount === "true" && req.body.password) {
+    try {
+      const { email, name } = deliveryInfo;
+      const existingUser = await User.findOne({ email });
+      if (!existingUser) {
+        const User = await import("../models/user.js").then(m => m.default);
+        const bcrypt = await import("bcryptjs").then(m => m.default);
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const newUser = await User.create({
+          fullName: name,
+          email,
+          password: hashedPassword,
+          username: email
+        });
+        userId = newUser._id;
+      }
+    } catch (err) {
+      console.error("Failed to create user during guest checkout:", err);
+      // We continue with guest order if registration fails, or we could bail. 
+      // User says "add that if a guest user wants to create an account", so it's a request.
+    }
+  }
+
   const order = await Order.create({
-    user: req.user?._id || null, // null for guests
+    user: userId,
     products,
     totalPrice,
     deliveryInfo,
     paymentMethod,
     paymentRef: (paymentMethod === "transfer" && !receiptImage) ? tx_ref : null,
     receiptImage: receiptImage,
-    status: paymentMethod === "cod" ? "pending" : "pending_payment",
+    status: "pending",
     statusHistory: [{
-      status: paymentMethod === "cod" ? "pending" : "pending_payment",
+      status: "pending",
       comment: paymentMethod === "cod" ? "Order placed via Cash on Delivery." : "Order placed via Bank Transfer. Waiting for verification."
     }],
   });
@@ -184,6 +210,17 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   }
 
   await order.save();
+
+  // Log the action
+  if (oldStatus !== order.status) {
+    await logAction(
+      req.user._id,
+      "UPDATE_ORDER_STATUS",
+      `Order: ${order._id}`,
+      { oldStatus, newStatus: order.status },
+      req.ip
+    );
+  }
 
   // Notify Customer if status changed to verified or delivered
   if (oldStatus !== order.status) {

@@ -19,7 +19,12 @@ export default function Products() {
   const [notification, setNotification] = useState(null);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
 
-  const categoryOptions = ["all", "electronics", "fashions", "books"];
+  const categoryOptions = [
+    { label: "ALL", value: "all" },
+    { label: "Electronics", value: "electronics" },
+    { label: "Fashions", value: "fashions" },
+    { label: "Books", value: "books" }
+  ];
 
   const showNotification = (msg, type = "error") => {
     setNotification({ msg, type });
@@ -118,9 +123,20 @@ export default function Products() {
       ) : (
         <>
           {visible.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-xl text-slate-400 font-medium">No products found matching your criteria.</p>
-              <button onClick={() => { setSearch(""); setCategory("all"); }} className="mt-4 text-indigo-600 font-bold hover:underline">Clear Filters</button>
+            <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm animate-fadeIn col-span-full">
+              <div className="mb-4 flex justify-center text-slate-200">
+                <svg className="w-20 h-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                </svg>
+              </div>
+              <p className="text-xl text-slate-500 font-bold tracking-tight">No products found.</p>
+              <p className="text-slate-400 text-sm mt-1 mb-8">Refine your search criteria or explore other categories.</p>
+              <button
+                onClick={() => { setSearch(""); setCategory("all"); }}
+                className="bg-slate-900 text-white px-8 py-3 rounded-full font-bold hover:bg-slate-800 transition shadow-lg active:scale-95"
+              >
+                Clear All
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">

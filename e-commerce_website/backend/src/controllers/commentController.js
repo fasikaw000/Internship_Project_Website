@@ -1,4 +1,4 @@
-import Comment from "../models/Comment.js";
+import Comment from "../models/comment.js";
 import { asyncHandler } from "../utils/errorHandler.js";
 import { sendMail } from "../utils/sendMail.js";
 

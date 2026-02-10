@@ -33,7 +33,7 @@ export default function Login() {
       await login({ email, password });
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Sign in failed. Please check your credentials.");
+      setError(err.response?.data?.message || "Login failed. Please check your credentials.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -44,12 +44,12 @@ export default function Login() {
     <div className="min-h-screen flex flex-col justify-center py-6 px-6 lg:px-8 bg-slate-50 lg:-mt-10">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-slate-900 tracking-tight">
-          Welcome back
+          Login to your account
         </h2>
         <p className="mt-2 text-center text-sm text-slate-600">
           Don't have an account?{" "}
           <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
-            Sign up for free
+            Register
           </Link>
         </p>
       </div>
@@ -66,7 +66,7 @@ export default function Login() {
 
           <form onSubmit={submitHandler} className="space-y-6">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Email address</label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Email</label>
               <input
                 type="email"
                 required
@@ -100,7 +100,8 @@ export default function Login() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
-                  )}
+                  )
+                  }
                 </button>
               </div>
             </div>
@@ -122,7 +123,7 @@ export default function Login() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                ) : "Sign In"}
+                ) : "Login"}
               </button>
             </div>
           </form>

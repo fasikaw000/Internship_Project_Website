@@ -1,6 +1,6 @@
 import axios from "axios";
 import { asyncHandler } from "../utils/errorHandler.js";
-import Order from "../models/Order.js";
+import Order from "../models/order.js";
 
 const CHAPA_URL = "https://api.chapa.co/v1/transaction/initialize";
 const CHAPA_VERIFY_URL = "https://api.chapa.co/v1/transaction/verify";

@@ -2,8 +2,14 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import User from "../src/models/user.js";
 import Order from "../src/models/order.js";
+import AuditLog from "../src/models/AuditLog.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const resetDB = async () => {
     try {
@@ -17,6 +23,10 @@ const resetDB = async () => {
         // Delete all orders
         const orderResult = await Order.deleteMany({});
         console.log(`Deleted ${orderResult.deletedCount} orders.`);
+
+        // Delete all admin history (audit logs)
+        const auditResult = await AuditLog.deleteMany({});
+        console.log(`Deleted ${auditResult.deletedCount} history logs.`);
 
         console.log("Database cleanup complete.");
         process.exit(0);

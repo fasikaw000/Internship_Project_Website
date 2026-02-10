@@ -40,7 +40,7 @@ export default function ResetPassword() {
             <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md animate-fadeIn">
                 <h2 className="text-2xl font-bold text-center text-indigo-700 mb-6 font-primary">Reset Password</h2>
 
-                {message && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">{message} (Redirecting to sign in...)</div>}
+                {message && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">{message} (Redirecting to login...)</div>}
                 {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">{error}</div>}
 
                 <form onSubmit={submitHandler} className="space-y-4">

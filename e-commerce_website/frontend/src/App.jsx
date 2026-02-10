@@ -32,6 +32,7 @@ import DeleteProduct from "./pages/admin/DeleteProduct";
 import ManageOrders from "./pages/admin/ManageOrders";
 import ManageComments from "./pages/admin/ManageComments";
 import ViewCustomers from "./pages/admin/ViewCustomers";
+import AdminHistory from "./pages/admin/AdminHistory";
 
 // Route Protection
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -75,6 +76,7 @@ function App() {
           <Route path="/admin/orders" element={<ProtectedRoute adminOnly><ManageOrders /></ProtectedRoute>} />
           <Route path="/admin/comments" element={<ProtectedRoute adminOnly><ManageComments /></ProtectedRoute>} />
           <Route path="/admin/customers" element={<ProtectedRoute adminOnly><ViewCustomers /></ProtectedRoute>} />
+          <Route path="/admin/history" element={<ProtectedRoute adminOnly><AdminHistory /></ProtectedRoute>} />
         </Routes>
       </main>
 

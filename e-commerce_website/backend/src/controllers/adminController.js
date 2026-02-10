@@ -1,5 +1,5 @@
 import User from "../models/user.js";
-import Order from "../models/Order.js";
+import Order from "../models/order.js";
 import Product from "../models/Product.js";
 import { asyncHandler } from "../utils/errorHandler.js";
 import { sendMail } from "../utils/sendMail.js";
@@ -7,6 +7,9 @@ import { logAction } from "./auditController.js";
 
 // Get dashboard stats (Admin)
 export const getStats = asyncHandler(async (req, res) => {
+  console.log("[AdminStats] Fetching dashboard stats...");
+  const start = Date.now();
+
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
 
@@ -18,57 +21,47 @@ export const getStats = asyncHandler(async (req, res) => {
   startOfMonth.setMonth(startOfMonth.getMonth() - 1);
   startOfMonth.setHours(0, 0, 0, 0);
 
-  const [users, products, orders] = await Promise.all([
-    User.countDocuments(),
-    Product.countDocuments(),
-    Order.countDocuments(),
-  ]);
-
-  // Calculate Total Revenue
-  const revenueResult = await Order.aggregate([
-    { $match: { status: { $in: ["verified", "delivered", "completed"] } } },
-    { $group: { _id: null, total: { $sum: "$totalPrice" } } }
-  ]);
-  const totalRevenue = revenueResult[0]?.total || 0;
-
-  // Calculate Today's Revenue
-  const todayRevenueResult = await Order.aggregate([
-    {
-      $match: {
-        status: { $in: ["verified", "delivered", "completed"] },
-        createdAt: { $gte: startOfToday }
+  const [countStats, revenueStats] = await Promise.all([
+    // Group 1: General Counts (Using estimatedDocumentCount for speed)
+    Promise.all([
+      User.estimatedDocumentCount(),
+      Product.estimatedDocumentCount(),
+      Order.estimatedDocumentCount(),
+    ]),
+    // Group 2: Combined Revenue Aggregation
+    Order.aggregate([
+      { $match: { status: { $in: ["verified", "delivered", "completed"] } } },
+      {
+        $facet: {
+          total: [{ $group: { _id: null, sum: { $sum: "$totalPrice" } } }],
+          today: [
+            { $match: { createdAt: { $gte: startOfToday } } },
+            { $group: { _id: null, sum: { $sum: "$totalPrice" } } }
+          ],
+          weekly: [
+            { $match: { createdAt: { $gte: startOfWeek } } },
+            { $group: { _id: null, sum: { $sum: "$totalPrice" } } }
+          ],
+          monthly: [
+            { $match: { createdAt: { $gte: startOfMonth } } },
+            { $group: { _id: null, sum: { $sum: "$totalPrice" } } }
+          ]
+        }
       }
-    },
-    { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+    ])
   ]);
-  const todayRevenue = todayRevenueResult[0]?.total || 0;
 
-  // Calculate Weekly Revenue
-  const weeklyRevenueResult = await Order.aggregate([
-    {
-      $match: {
-        status: { $in: ["verified", "delivered", "completed"] },
-        createdAt: { $gte: startOfWeek }
-      }
-    },
-    { $group: { _id: null, total: { $sum: "$totalPrice" } } }
-  ]);
-  const weeklyRevenue = weeklyRevenueResult[0]?.total || 0;
-
-  // Calculate Monthly Revenue
-  const monthlyRevenueResult = await Order.aggregate([
-    {
-      $match: {
-        status: { $in: ["verified", "delivered", "completed"] },
-        createdAt: { $gte: startOfMonth }
-      }
-    },
-    { $group: { _id: null, total: { $sum: "$totalPrice" } } }
-  ]);
-  const monthlyRevenue = monthlyRevenueResult[0]?.total || 0;
+  const [users, products, orders] = countStats;
+  const totalRevenue = revenueStats[0]?.total[0]?.sum || 0;
+  const todayRevenue = revenueStats[0]?.today[0]?.sum || 0;
+  const weeklyRevenue = revenueStats[0]?.weekly[0]?.sum || 0;
+  const monthlyRevenue = revenueStats[0]?.monthly[0]?.sum || 0;
 
   // Low Stock Products
   const lowStockProducts = await Product.find({ stock: { $lt: 5 }, isDeleted: { $ne: true } }).select("name stock");
+
+  const duration = Date.now() - start;
+  console.log(`[AdminStats] Dashboard stats fetched in ${duration}ms`);
 
   res.json({
     users,

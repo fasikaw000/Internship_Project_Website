@@ -1,5 +1,5 @@
 import Review from "../models/Review.js";
-import Order from "../models/Order.js";
+import Order from "../models/order.js";
 import { asyncHandler } from "../utils/errorHandler.js";
 
 // Create a review (Verified Purchase only)

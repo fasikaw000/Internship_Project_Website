@@ -131,23 +131,27 @@ export default function ManageOrders() {
       ) : (
         <div className="grid gap-6">
           {orders.map((o) => (
-            <div key={o._id} className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row">
+            <div key={o._id} className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col xl:flex-row">
               {/* Left Column: Client & Status */}
-              <div className="p-6 md:w-1/3 bg-slate-50 border-r border-slate-100 flex flex-col justify-between">
+              <div className="p-6 xl:w-1/3 bg-slate-50 border-b xl:border-b-0 xl:border-r border-slate-100 flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded">Order ID: {o._id.slice(-6).toUpperCase()}</span>
                     <span className="text-[10px] text-slate-400 font-medium">{new Date(o.createdAt).toLocaleString()}</span>
                   </div>
-                  <h3 className="font-bold text-slate-800 text-lg leading-tight mb-1">{o.user?.fullName}</h3>
-                  <p className="text-xs text-slate-500 truncate mb-4 italic">{o.user?.email}</p>
+                  <h3 className="font-bold text-slate-800 text-lg leading-tight mb-1">
+                    {o.user?.fullName || o.deliveryInfo?.name || "Guest User"}
+                  </h3>
+                  <p className="text-xs text-slate-500 truncate mb-4 italic">
+                    {o.user?.email || o.deliveryInfo?.email || "No Email Provided"}
+                  </p>
 
                   <div className="space-y-2 mb-6">
                     <p className="text-xs text-slate-600"><span className="font-bold text-slate-400 uppercase text-[9px]">Phone:</span> {o.deliveryInfo?.phone}</p>
-                    <p className="text-xs text-slate-600 leading-relaxed"><span className="font-bold text-slate-400 uppercase text-[9px]">Ship to:</span> {o.deliveryInfo?.address}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed"><span className="font-bold text-slate-400 uppercase text-[9px]">Deliver to:</span> {o.deliveryInfo?.address}</p>
                     <div className="pt-2">
-                      <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full ${o.paymentMethod === 'cod' ? 'bg-teal-100 text-teal-700' : 'bg-slate-100 text-slate-600'}`}>
-                        Method: {o.paymentMethod?.toUpperCase() || 'TRANSFER'}
+                      <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full bg-slate-100 text-slate-600">
+                        Payment Method: {o.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Transfer'}
                       </span>
                     </div>
                   </div>
@@ -201,11 +205,11 @@ export default function ManageOrders() {
               </div>
 
               {/* Right Column: Receipt & Payment */}
-              <div className="p-6 md:w-1/4 bg-indigo-900 text-white flex flex-col justify-between text-center relative overflow-hidden">
+              <div className="p-6 xl:w-1/4 bg-indigo-900 text-white flex flex-col justify-between text-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-800 -rotate-45 translate-x-16 -translate-y-16 rounded-full opacity-20"></div>
 
                 <div className="z-10">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-indigo-300 opacity-60 mb-2">Total Amount</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-indigo-300 opacity-60 mb-2">Total</p>
                   <p className="text-3xl font-black">{o.totalPrice?.toFixed(2)}</p>
                   <p className="text-xs font-medium text-indigo-200 mb-6 tracking-wider">ETB</p>
 
@@ -216,7 +220,7 @@ export default function ManageOrders() {
                       <div className="max-h-24 overflow-y-auto space-y-2 pr-1 scrollbar-thin scrollbar-thumb-indigo-700">
                         {o.statusHistory.slice().reverse().map((hist, i) => (
                           <div key={i} className="text-[9px] text-indigo-100 border-l-2 border-indigo-400 pl-2">
-                            <p className="font-bold opacity-90">{hist.status?.replace("_", " ").toUpperCase()}</p>
+                            <p className="font-bold opacity-90">{hist.status?.replace("pending_payment", "pending").replace("_", " ").toUpperCase()}</p>
                             <p className="opacity-60">{new Date(hist.timestamp).toLocaleDateString()} {new Date(hist.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                           </div>
                         ))}

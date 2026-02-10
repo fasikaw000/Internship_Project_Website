@@ -1,3 +1,8 @@
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { getMyOrders, resubmitReceipt } from "../services/orderService";
+
 const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5001/api").replace("/api", "");
 
 export default function Orders() {
@@ -177,7 +182,7 @@ export default function Orders() {
         <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
           <p className="text-xl text-slate-400 font-medium mb-4">No orders found.</p>
           <Link to="/products" className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold hover:bg-indigo-700 transition shadow-lg inline-block">
-            Start Shopping
+            Shop Now
           </Link>
         </div>
       ) : (
@@ -187,29 +192,31 @@ export default function Orders() {
 
               {/* Header */}
               <div className="bg-slate-50 px-6 py-4 flex flex-col md:flex-row justify-between items-center border-b border-slate-100 gap-4">
-                <div className="flex gap-8 text-sm">
+                <div className="flex flex-wrap gap-x-8 gap-y-4 text-sm justify-center md:justify-start">
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Order Placed</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center md:text-left">Order Placed</p>
                     <p className="font-semibold text-slate-700">{new Date(o.createdAt).toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center md:text-left">Total</p>
                     <p className="font-semibold text-slate-700">{o.totalPrice?.toFixed(2)} ETB</p>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ship To</p>
-                    <p className="font-semibold text-slate-700 group relative cursor-help">
+                  <div className="min-w-[100px]">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center md:text-left">Deliver To</p>
+                    <p className="font-semibold text-slate-700 group relative cursor-help text-center md:text-left">
                       {o.deliveryInfo?.name}
-                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition pointer-events-none">
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition pointer-events-none z-10">
                         {o.deliveryInfo?.address}
                       </span>
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Method</p>
-                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${o.paymentMethod === 'cod' ? 'bg-teal-100 text-teal-700' : 'bg-slate-100 text-slate-600'}`}>
-                      {o.paymentMethod?.toUpperCase() || 'TRANSFER'}
-                    </span>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center md:text-left">Payment Method</p>
+                    <div className="flex justify-center md:justify-start">
+                      <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                        {o.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Transfer'}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">

@@ -23,6 +23,8 @@ export default function Checkout() {
   });
   const [paymentMethod, setPaymentMethod] = useState("transfer");
   const [receipt, setReceipt] = useState(null);
+  const [createAccount, setCreateAccount] = useState(false);
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState(null);
 
@@ -85,6 +87,10 @@ export default function Checkout() {
       errors.push("Please upload the payment receipt for bank transfer.");
     }
 
+    if (createAccount && !password) {
+      errors.push("Please enter a password to create an account.");
+    }
+
     if (errors.length > 0) {
       showNotification("Please check the form: " + errors[0]);
       return;
@@ -96,6 +102,10 @@ export default function Checkout() {
       formData.append("paymentMethod", paymentMethod);
       if (receipt) formData.append("receiptImage", receipt);
       formData.append("products", JSON.stringify(cart.map((item) => ({ product: item._id, quantity: item.quantity }))));
+      if (createAccount) {
+        formData.append("createAccount", true);
+        formData.append("password", password);
+      }
 
       await placeOrder(formData);
 
@@ -117,8 +127,8 @@ export default function Checkout() {
       {/* Notification Banner */}
       {notification && (
         <div className={`mb-6 p-4 rounded-2xl border animate-slideDown flex items-center gap-3 shadow-sm ${notification.type === "success"
-            ? "bg-emerald-50 border-emerald-100 text-emerald-800"
-            : "bg-rose-50 border-rose-100 text-rose-800"
+          ? "bg-emerald-50 border-emerald-100 text-emerald-800"
+          : "bg-rose-50 border-rose-100 text-rose-800"
           }`}>
           <span className="text-xl">{notification.type === "success" ? "✅" : "⚠️"}</span>
           <p className="font-bold text-sm tracking-tight">{notification.msg}</p>
@@ -190,7 +200,7 @@ export default function Checkout() {
           <input
             type="email"
             className={`appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition ${user ? "bg-slate-50 text-slate-400 cursor-not-allowed" : ""}`}
-            placeholder="Email Address"
+            placeholder="Email"
             value={form.email}
             readOnly={!!user}
             onChange={(e) => !user && setForm({ ...form, email: e.target.value })}
@@ -205,6 +215,34 @@ export default function Checkout() {
             required
           ></textarea>
         </div>
+
+        {/* Guest Account Creation */}
+        {!user && (
+          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 animate-slideDown">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                className="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300"
+                checked={createAccount}
+                onChange={(e) => setCreateAccount(e.target.checked)}
+              />
+              <span className="text-sm font-bold text-slate-700">Create an account for later?</span>
+            </label>
+            {createAccount && (
+              <div className="mt-4 animate-fadeIn">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Create Password</p>
+                <input
+                  type="password"
+                  className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                  placeholder="Choose a strong password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required={createAccount}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {paymentMethod === "transfer" && (
           <div className="border border-dashed border-indigo-300 bg-indigo-50/30 p-5 rounded-2xl text-center animate-slideDown">

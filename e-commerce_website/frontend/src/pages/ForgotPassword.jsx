@@ -53,7 +53,7 @@ export default function ForgotPassword() {
 
                 <form onSubmit={submitHandler} className="space-y-4">
                     <div className="space-y-1">
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Email address</label>
+                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Email</label>
                         <input
                             type="email"
                             className="border border-gray-300 w-full p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
@@ -79,7 +79,7 @@ export default function ForgotPassword() {
                 </form>
 
                 <div className="mt-6 text-center">
-                    <a href="/login" className="text-indigo-600 hover:text-indigo-800 transition-colors font-medium">Back to Sign In</a>
+                    <a href="/login" className="text-indigo-600 hover:text-indigo-800 transition-colors font-medium">Back to Login</a>
                 </div>
             </div>
         </div>

@@ -22,11 +22,11 @@ export default function Navbar() {
   return (
     <nav className="bg-slate-900 border-b border-slate-800 relative z-50">
       <div className="px-6 py-3.5 flex items-center justify-between shadow-md relative z-50 bg-slate-900">
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="bg-teal-500 p-1.5 rounded-lg shadow-lg group-hover:scale-110 transition duration-300">
+        <Link to="/" className="flex items-center gap-1.5 md:gap-2 group">
+          <div className="bg-teal-500 p-1 md:p-1.5 rounded-lg shadow-lg group-hover:scale-110 transition duration-300">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-white"
+              className="h-5 w-5 md:h-6 md:w-6 text-white"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -39,13 +39,13 @@ export default function Navbar() {
               />
             </svg>
           </div>
-          <span className="text-xl font-black text-white tracking-tighter uppercase">
+          <span className="text-lg md:text-xl font-black text-white tracking-tighter uppercase whitespace-nowrap">
             MICHU<span className="text-teal-400">GEBEYA</span>
           </span>
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden lg:flex gap-7 items-center">
+        <div className="hidden lg:flex gap-4 xl:gap-7 items-center">
           <NavLink to="/" end className={navClass}>Home</NavLink>
           <NavLink to="/products" className={navClass}>Products</NavLink>
           <NavLink to="/contact" className={navClass}>Contact</NavLink>
@@ -53,32 +53,32 @@ export default function Navbar() {
           <NavLink to="/cart" className={navClass}>Cart</NavLink>
           {user && <NavLink to="/orders" className={navClass}>My Orders</NavLink>}
           {isAdmin && (
-            <div className="ml-4 pl-4 border-l border-slate-700">
+            <div className="ml-2 xl:ml-4 pl-2 xl:pl-4 border-l border-slate-700">
               <NavLink
                 to="/admin"
                 className={({ isActive }) =>
-                  `px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-tighter transition-all duration-300 ${isActive
+                  `px-2 xl:px-3 py-1.5 rounded-lg text-[10px] xl:text-xs font-black uppercase tracking-tighter transition-all duration-300 ${isActive
                     ? "bg-teal-500 text-white shadow-lg shadow-teal-500/50"
                     : "bg-slate-800 text-teal-400 hover:bg-slate-700 hover:text-white"
                   }`
                 }
               >
-                Dashboard
+                Admin
               </NavLink>
             </div>
           )}
         </div>
 
-        <div className="hidden lg:flex gap-4 items-center font-medium">
+        <div className="hidden lg:flex gap-2 xl:gap-4 items-center font-medium">
           {!user ? (
             <>
-              <NavLink to="/login" className={navClass}>Sign In</NavLink>
-              <Link to="/register" className="bg-white hover:bg-teal-50 text-teal-700 px-3 py-1.5 rounded-lg font-medium transition">Register</Link>
+              <NavLink to="/login" className={navClass}>Login</NavLink>
+              <Link to="/register" className="bg-white hover:bg-teal-50 text-teal-700 px-3 py-1.5 rounded-lg text-sm font-medium transition">Register</Link>
             </>
           ) : (
             <>
-              <span className="text-sm text-teal-100">Welcome, {user.fullName}</span>
-              <button onClick={handleLogout} className="text-teal-100 hover:text-white transition">Logout</button>
+              <span className="text-xs xl:text-sm text-teal-100">Welcome, {user.fullName}</span>
+              <button onClick={handleLogout} className="text-teal-100 hover:text-white text-sm transition">Logout</button>
             </>
           )}
         </div>
@@ -112,7 +112,7 @@ export default function Navbar() {
           <div className="border-t border-slate-700 pt-4 flex flex-col gap-3">
             {!user ? (
               <>
-                <NavLink to="/login" className={navClass} onClick={() => setIsMenuOpen(false)}>Sign In</NavLink>
+                <NavLink to="/login" className={navClass} onClick={() => setIsMenuOpen(false)}>Login</NavLink>
                 <Link to="/register" className="bg-white hover:bg-teal-50 text-teal-700 px-3 py-2 rounded-lg font-medium transition text-center" onClick={() => setIsMenuOpen(false)}>Register</Link>
               </>
             ) : (

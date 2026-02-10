@@ -53,7 +53,7 @@ export default function UserProfile() {
               <p className="text-gray-800 font-medium">{user.fullName}</p>
             </div>
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-              <p className="text-xs font-semibold text-gray-400 uppercase mb-1">Email Address</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase mb-1">Email</p>
               <p className="text-gray-800 font-medium">{user.email}</p>
             </div>
           </div>

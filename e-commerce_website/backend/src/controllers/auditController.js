@@ -3,17 +3,18 @@ import { asyncHandler } from "../utils/errorHandler.js";
 
 // Internal helper to create a log entry
 export const logAction = async (adminId, action, target, details, ip) => {
+    console.log(`[AuditLog] Attempting to log action: ${action} for admin: ${adminId}`);
     try {
-        await AuditLog.create({
+        const log = await AuditLog.create({
             admin: adminId,
             action,
             target,
             details,
             ip,
         });
+        console.log(`[AuditLog] Successfully created log: ${log._id}`);
     } catch (error) {
-        console.error("Failed to create audit log:", error);
-        // Don't crash the main flow if logging fails
+        console.error("[AuditLog] Failed to create audit log:", error);
     }
 };
 
