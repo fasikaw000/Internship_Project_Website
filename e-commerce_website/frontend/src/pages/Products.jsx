@@ -106,15 +106,7 @@ export default function Products() {
             onChange={(e) => setSearch(e.target.value)}
             className="border border-slate-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none w-full md:w-64"
           />
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="border border-slate-200 rounded-lg px-4 py-2 text-sm font-semibold bg-white focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer w-full sm:w-auto"
-          >
-            <option value="newest">Newest Arrivals</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-          </select>
+
         </div>
       </div>
 

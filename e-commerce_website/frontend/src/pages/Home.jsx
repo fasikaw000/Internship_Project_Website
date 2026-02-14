@@ -17,7 +17,7 @@ export default function Home() {
             <span className="text-indigo-200">Welcome to</span> <span className="whitespace-nowrap text-white">MICHU<span className="text-teal-400">GEBEYA</span></span>
           </h1>
           <p className="mb-6 text-base md:text-lg text-white font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] opacity-90 max-w-xl">
-            Experience premium quality and exceptional design with our curated collection of Electronics, Fashion, and Books—delivered straight to your door.
+            Experience premium quality and exceptional design with our curated collection of Electronics, Fashions, and Books—delivered straight to your door.
           </p>
           <Link
             to="/products"

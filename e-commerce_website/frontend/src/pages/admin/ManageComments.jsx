@@ -24,10 +24,10 @@ export default function ManageComments() {
       <div className="mb-4">
         <Link to="/admin" className="text-indigo-600 hover:underline text-sm">← Back to Dashboard</Link>
       </div>
-      <h2 className="text-xl font-bold mb-4">Manage Comments</h2>
+      <h2 className="text-xl font-bold mb-4">Manage Messages</h2>
 
       {comments.length === 0 ? (
-        <p className="text-gray-500">No comments yet.</p>
+        <p className="text-gray-500">No messages yet.</p>
       ) : (
         comments.map((c) => (
           <div key={c._id} className="border border-gray-200 rounded-lg p-4 mb-3 bg-white shadow-sm">

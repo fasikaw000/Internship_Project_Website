@@ -16,7 +16,8 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [bank, setBank] = useState({ fullName: "", accountNumber: "" });
   const [form, setForm] = useState({
-    name: user?.fullName || "",
+    firstName: user?.fullName?.split(" ")[0] || "",
+    lastName: user?.fullName?.split(" ").slice(1).join(" ") || "",
     phone: "",
     email: user?.email || "",
     address: "",
@@ -56,7 +57,9 @@ export default function Checkout() {
       setForm((prev) => ({
         ...prev,
         email: user.email,
-        name: user.fullName || prev.name,
+        email: user.email,
+        firstName: user.fullName?.split(" ")[0] || prev.firstName,
+        lastName: user.fullName?.split(" ").slice(1).join(" ") || prev.lastName,
       }));
     }
   }, [user]);
@@ -68,7 +71,7 @@ export default function Checkout() {
       return;
     }
     const trimmed = {
-      name: form.name.trim(),
+      name: `${form.firstName} ${form.lastName}`.trim(),
       phone: form.phone.trim(),
       email: form.email.trim(),
       address: form.address.trim(),
@@ -168,8 +171,8 @@ export default function Checkout() {
           <p className="font-bold text-indigo-900 mb-3 uppercase text-xs tracking-widest">Bank Transfer Details</p>
           <div className="bg-white p-4 rounded-xl shadow-sm inline-block text-left border border-indigo-100">
             <p className="text-slate-500 text-xs font-bold uppercase mb-1 opacity-50">CBE Account</p>
-            <p className="text-slate-700 text-sm font-bold mb-1">{bank.fullName || "Loading..."}</p>
-            <p className="font-mono font-black text-indigo-600 text-xl tracking-tighter">{bank.accountNumber || "Wait..."}</p>
+            <p className="font-mono font-black text-indigo-600 text-xl tracking-tighter">1000787545343</p>
+            <p className="text-slate-700 text-sm font-bold mb-1">Fasikaw Ayten Akele</p>
           </div>
           <p className="text-[10px] text-indigo-400 mt-4 font-medium">Please upload the receipt screenshot below after transfer.</p>
         </div>
@@ -183,16 +186,25 @@ export default function Checkout() {
 
       <form onSubmit={submitHandler} className="space-y-4">
         <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              placeholder="First Name"
+              value={form.firstName}
+              onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+              required
+            />
+            <input
+              className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              placeholder="Last Name"
+              value={form.lastName}
+              onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+              required
+            />
+          </div>
           <input
             className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-            placeholder="Recipient Full Name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            required
-          />
-          <input
-            className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-            placeholder="Ethiopian phone (e.g. 0911123456)"
+            placeholder="phone(e.g 0951769049 or +251951769049)"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
             required

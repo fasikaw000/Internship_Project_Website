@@ -52,7 +52,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      showNotification("Account created successfully! Redirecting to login...", "success");
+      showNotification("Account created successfully! Redirecting to Log In...", "success");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       showNotification(err.response?.data?.message || "Registration failed. Please try again.");
@@ -65,12 +65,12 @@ export default function Register() {
     <div className="min-h-screen flex flex-col justify-center py-12 px-6 lg:px-8 bg-slate-50">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-slate-900 tracking-tight">
-          Create your account
+          Create Account
         </h2>
         <p className="mt-2 text-center text-sm text-slate-600">
           Already have an account?{" "}
           <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
-            Login
+            Log In
           </Link>
         </p>
       </div>

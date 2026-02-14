@@ -79,7 +79,7 @@ export default function ForgotPassword() {
                 </form>
 
                 <div className="mt-6 text-center">
-                    <a href="/login" className="text-indigo-600 hover:text-indigo-800 transition-colors font-medium">Back to Login</a>
+                    <a href="/login" className="text-indigo-600 hover:text-indigo-800 transition-colors font-medium">Back to Log In</a>
                 </div>
             </div>
         </div>

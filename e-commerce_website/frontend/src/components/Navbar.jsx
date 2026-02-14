@@ -48,8 +48,8 @@ export default function Navbar() {
         <div className="hidden lg:flex gap-4 xl:gap-7 items-center">
           <NavLink to="/" end className={navClass}>Home</NavLink>
           <NavLink to="/products" className={navClass}>Products</NavLink>
-          <NavLink to="/contact" className={navClass}>Contact</NavLink>
-          <NavLink to="/about" className={navClass}>About</NavLink>
+          <NavLink to="/contact" className={navClass}>Contact Us</NavLink>
+          <NavLink to="/about" className={navClass}>About Us</NavLink>
           <NavLink to="/cart" className={navClass}>Cart</NavLink>
           {user && <NavLink to="/orders" className={navClass}>My Orders</NavLink>}
           {isAdmin && (
@@ -72,13 +72,13 @@ export default function Navbar() {
         <div className="hidden lg:flex gap-2 xl:gap-4 items-center font-medium">
           {!user ? (
             <>
-              <NavLink to="/login" className={navClass}>Login</NavLink>
-              <Link to="/register" className="bg-white hover:bg-teal-50 text-teal-700 px-3 py-1.5 rounded-lg text-sm font-medium transition">Register</Link>
+              <NavLink to="/login" className="border border-white text-white px-3 py-1 rounded-full text-sm font-semibold transition hover:bg-white/10">Log In</NavLink>
+              <Link to="/register" className="bg-white hover:bg-teal-50 text-teal-700 px-3 py-1.5 rounded-full text-sm font-bold transition">Register</Link>
             </>
           ) : (
             <>
               <span className="text-xs xl:text-sm text-teal-100">Welcome, {user.fullName}</span>
-              <button onClick={handleLogout} className="text-teal-100 hover:text-white text-sm transition">Logout</button>
+              <button onClick={handleLogout} className="border border-white text-white px-3 py-1 rounded-full text-sm font-semibold transition hover:bg-white/10">Log Out</button>
             </>
           )}
         </div>
@@ -112,13 +112,13 @@ export default function Navbar() {
           <div className="border-t border-slate-700 pt-4 flex flex-col gap-3">
             {!user ? (
               <>
-                <NavLink to="/login" className={navClass} onClick={() => setIsMenuOpen(false)}>Login</NavLink>
+                <NavLink to="/login" className={navClass} onClick={() => setIsMenuOpen(false)}>Log In</NavLink>
                 <Link to="/register" className="bg-white hover:bg-teal-50 text-teal-700 px-3 py-2 rounded-lg font-medium transition text-center" onClick={() => setIsMenuOpen(false)}>Register</Link>
               </>
             ) : (
               <>
                 <div className="text-center text-teal-200 text-sm mb-2">Signed in as {user.fullName}</div>
-                <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="bg-red-500/10 text-red-200 border border-red-500/20 w-full py-2 rounded hover:bg-red-500/20 transition">Logout</button>
+                <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="bg-red-500/10 text-red-200 border border-red-500/20 w-full py-2 rounded hover:bg-red-500/20 transition">Log Out</button>
               </>
             )}
           </div>

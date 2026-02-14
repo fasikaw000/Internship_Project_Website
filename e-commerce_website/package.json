@@ -1,0 +1,13 @@
+{
+    "name": "ecommerce-root",
+    "version": "1.0.0",
+    "description": "Root script to run full stack project",
+    "scripts": {
+        "start": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+        "backend": "npm run dev --prefix backend",
+        "frontend": "npm run dev --prefix frontend"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}
