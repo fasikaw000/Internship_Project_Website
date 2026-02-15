@@ -12,7 +12,7 @@ export default function ProductCard({ product, onDelete }) {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const imageSrc = product.imageUrl || (product.image ? `${API_BASE}/uploads/products/${product.image}` : null);
-  const isNew = product.createdAt && (new Date() - new Date(product.createdAt)) / (1000 * 60 * 60 * 24) < 7;
+
 
   const handleAddToCart = () => {
     addToCart(product, qty);
@@ -40,9 +40,7 @@ export default function ProductCard({ product, onDelete }) {
 
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
-          {isNew && (
-            <span className="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">NEW</span>
-          )}
+
           {user?.role === "admin" && (
             <span className="bg-slate-800 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm opacity-90">
               Stock: {product.stock}
