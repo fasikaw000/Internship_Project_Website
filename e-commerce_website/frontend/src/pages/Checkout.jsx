@@ -230,27 +230,30 @@ export default function Checkout() {
 
         {/* Guest Account Creation */}
         {!user && (
-          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 animate-slideDown">
-            <label className="flex items-center gap-3 cursor-pointer">
+          <div className="bg-white p-6 rounded-2xl border-2 border-indigo-100 shadow-xl shadow-indigo-100/20 animate-slideUp">
+            <label className="flex items-center gap-3 cursor-pointer group bg-slate-50 p-4 rounded-xl hover:bg-indigo-50 transition-colors border border-slate-100">
               <input
                 type="checkbox"
-                className="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300"
+                className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-slate-300 transition-all cursor-pointer"
                 checked={createAccount}
                 onChange={(e) => setCreateAccount(e.target.checked)}
               />
-              <span className="text-sm font-bold text-slate-700">Create an account for later?</span>
+              <span className="text-sm font-black text-slate-700 group-hover:text-indigo-900 transition-colors uppercase tracking-widest">Create account for later?</span>
             </label>
+
             {createAccount && (
-              <div className="mt-4 animate-fadeIn">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Create Password</p>
-                <input
-                  type="password"
-                  className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-                  placeholder="Choose a strong password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required={createAccount}
-                />
+              <div className="mt-6 space-y-4 animate-fadeIn">
+                <div className="relative group">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 px-1">password</p>
+                  <input
+                    type="password"
+                    className="appearance-none block w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all group-hover:border-indigo-300"
+                    placeholder=""
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required={createAccount}
+                  />
+                </div>
               </div>
             )}
           </div>

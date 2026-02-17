@@ -52,10 +52,16 @@ export default function Register() {
 
     setLoading(true);
     try {
-      showNotification("Account created successfully! Redirecting to Log In...", "success");
-      setTimeout(() => navigate("/login"), 2000);
+      showNotification(
+        "Welcome to MichuGebeya! Your professional account has been created successfully. Redirecting you to the login portal...",
+        "success"
+      );
+      setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
-      showNotification(err.response?.data?.message || "Registration failed. Please try again.");
+      showNotification(
+        err.response?.data?.message || "Registration encountered an unexpected issue. Please refine your details and try again.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }

@@ -42,7 +42,7 @@ export default function AdminDashboard() {
   const links = [
     { to: "/admin/products", label: "Manage Products", desc: "Add, edit, delete products" },
     { to: "/admin/orders", label: "Manage Orders", desc: "View and update order status" },
-    { to: "/admin/comments", label: "Manage Messages", desc: "View and delete customer messages" },
+    { to: "/admin/messages", label: "Manage Messages", desc: "View and delete customer messages" },
     { to: "/admin/customers", label: "View Customers", desc: "List registered users" },
     { to: "/admin/history", label: "Admin History", desc: "View admin activity logs" },
   ];

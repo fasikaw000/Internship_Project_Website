@@ -99,8 +99,31 @@ export default function ViewCustomers() {
                 </div>
 
                 {!isSelf && (
-                  <div className="mt-4 md:mt-0 flex items-center space-x-3 text-slate-400 italic text-xs">
-                    Customer Details View-Only
+                  <div className="mt-4 md:mt-0 flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to change this user's role to ${u.role === 'admin' ? 'USER' : 'ADMIN'}?`)) {
+                          handleToggleRole(u._id, u.role);
+                        }
+                      }}
+                      className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-sm ${u.role === 'admin'
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                        : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-100'
+                        }`}
+                    >
+                      {u.role === 'admin' ? 'Demote to User' : 'Promote to Admin'}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        if (window.confirm("CRITICAL: Are you sure you want to delete this user permanently? This action cannot be undone.")) {
+                          handleDeleteUser(u._id);
+                        }
+                      }}
+                      className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest text-rose-600 border border-rose-100 hover:bg-rose-50 transition-all"
+                    >
+                      Delete
+                    </button>
                   </div>
                 )}
               </div>

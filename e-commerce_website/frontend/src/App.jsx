@@ -30,7 +30,7 @@ import ManageProducts from "./pages/admin/ManageProducts";
 import AddEditProduct from "./pages/admin/AddEditProduct";
 import DeleteProduct from "./pages/admin/DeleteProduct";
 import ManageOrders from "./pages/admin/ManageOrders";
-import ManageComments from "./pages/admin/ManageComments";
+import ManageMessages from "./pages/admin/ManageMessages";
 import ViewCustomers from "./pages/admin/ViewCustomers";
 import AdminHistory from "./pages/admin/AdminHistory";
 
@@ -47,7 +47,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
-          <Route path="/products/:id" element={<ProductDetails />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
@@ -74,7 +74,7 @@ function App() {
           <Route path="/admin/product/edit/:id" element={<ProtectedRoute adminOnly><AddEditProduct /></ProtectedRoute>} />
           <Route path="/admin/product/delete/:id" element={<ProtectedRoute adminOnly><DeleteProduct /></ProtectedRoute>} />
           <Route path="/admin/orders" element={<ProtectedRoute adminOnly><ManageOrders /></ProtectedRoute>} />
-          <Route path="/admin/comments" element={<ProtectedRoute adminOnly><ManageComments /></ProtectedRoute>} />
+          <Route path="/admin/messages" element={<ProtectedRoute adminOnly><ManageMessages /></ProtectedRoute>} />
           <Route path="/admin/customers" element={<ProtectedRoute adminOnly><ViewCustomers /></ProtectedRoute>} />
           <Route path="/admin/history" element={<ProtectedRoute adminOnly><AdminHistory /></ProtectedRoute>} />
         </Routes>

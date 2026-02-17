@@ -50,7 +50,6 @@ export default function Navbar() {
           <NavLink to="/products" className={navClass}>Products</NavLink>
           <NavLink to="/contact" className={navClass}>Contact Us</NavLink>
           <NavLink to="/about" className={navClass}>About Us</NavLink>
-          <NavLink to="/cart" className={navClass}>Cart</NavLink>
           {user && <NavLink to="/orders" className={navClass}>My Orders</NavLink>}
           {isAdmin && (
             <div className="ml-2 xl:ml-4 pl-2 xl:pl-4 border-l border-slate-700">
@@ -105,7 +104,6 @@ export default function Navbar() {
           <NavLink to="/products" className={navClass} onClick={() => setIsMenuOpen(false)}>Products</NavLink>
           <NavLink to="/contact" className={navClass} onClick={() => setIsMenuOpen(false)}>Contact Us</NavLink>
           <NavLink to="/about" className={navClass} onClick={() => setIsMenuOpen(false)}>About Us</NavLink>
-          <NavLink to="/cart" className={navClass} onClick={() => setIsMenuOpen(false)}>Cart</NavLink>
           {user && <NavLink to="/orders" className={navClass} onClick={() => setIsMenuOpen(false)}>My Orders</NavLink>}
           {isAdmin && <NavLink to="/admin" className={navClass} onClick={() => setIsMenuOpen(false)}>Admin</NavLink>}
 
