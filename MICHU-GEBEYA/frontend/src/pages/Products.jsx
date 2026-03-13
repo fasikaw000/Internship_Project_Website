@@ -4,33 +4,35 @@ import CategoryFilter from "../components/CategoryFilter";
 import Loader from "../components/Loader";
 import { getProducts, deleteProduct } from "../services/productService";
 import { useAuth } from "../hooks/useAuth";
-import { Link } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 const INITIAL_SHOW = 8;
 const LOAD_MORE_STEP = 8;
 
 export default function Products() {
   const { user } = useAuth();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialCategory = queryParams.get("cat") || "all";
+
   const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState(initialCategory);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("newest");
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState(null);
   const [showCount, setShowCount] = useState(INITIAL_SHOW);
 
-  const categoryOptions = [
-    { label: "ALL", value: "all" },
-    { label: "Electronics", value: "electronics" },
-    { label: "Fashions", value: "fashions" },
-    { label: "Books", value: "books" }
-  ];
-
   const showNotification = (msg, type = "error") => {
     setNotification({ msg, type });
     window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => setNotification(null), 5000);
   };
+
+  useEffect(() => {
+    const urlCat = new URLSearchParams(location.search).get("cat") || "all";
+    setCategory(urlCat);
+  }, [location.search]);
 
   useEffect(() => {
     setLoading(true);
@@ -74,41 +76,37 @@ export default function Products() {
           <p className="font-bold text-sm tracking-tight">{notification.msg}</p>
         </div>
       )}
-      {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <div>
-          <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Discover Premium Quality Products</p>
-        </div>
 
-        {user?.role === "admin" && (
+
+
+      {/* Centered Search Bar */}
+      <div className="flex flex-col items-center mb-12">
+        <div className="relative w-full max-w-2xl">
+          <input
+            type="text"
+            placeholder="search products"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-white border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-800 shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all duration-300 font-medium pr-14"
+          />
+          <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {user?.role === "admin" && (
+        <div className="flex justify-end mb-8">
           <Link
             to="/admin/product/new"
-            className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg hover:bg-indigo-700 hover:scale-105 transition flex items-center gap-2"
+            className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 hover:scale-105 transition flex items-center gap-2"
           >
             <span>+</span> Add New Product
           </Link>
-        )}
-      </div>
-
-      {/* Filter Bar */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
-        <CategoryFilter
-          categories={categoryOptions}
-          selected={category}
-          onChange={setCategory}
-        />
-
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border border-slate-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none w-full md:w-64"
-          />
-
         </div>
-      </div>
+      )}
 
       {loading ? (
         <Loader />
@@ -143,9 +141,9 @@ export default function Products() {
               <button
                 type="button"
                 onClick={() => setShowCount((c) => Math.min(c + LOAD_MORE_STEP, filteredProducts.length))}
-                className="bg-white border border-slate-300 text-slate-700 px-8 py-3 rounded-full font-bold hover:bg-slate-50 transition hover:border-slate-400"
+                className="bg-indigo-600 text-white px-10 py-3.5 rounded-full font-black uppercase tracking-widest text-xs shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 hover:shadow-indigo-600/40 transition-all duration-300 active:scale-95"
               >
-                Load More Products
+                show more
               </button>
             </div>
           )}

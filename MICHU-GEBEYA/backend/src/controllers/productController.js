@@ -105,11 +105,15 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 export const getProducts = asyncHandler(async (req, res) => {
   const { category } = req.query;
   const filter = {};
+
   if (category && category.toLowerCase() !== "all") {
-    filter.category = category.toLowerCase();
-  }
-  if (category && category.toLowerCase() !== "all") {
-    filter.category = category.toLowerCase();
+    const cat = category.toLowerCase();
+    if (cat === "fashions") {
+      // Handle fashions as a group of sub-categories
+      filter.category = { $in: ["fashions", "mens", "womens"] };
+    } else {
+      filter.category = cat;
+    }
   }
 
   // Filter out soft-deleted products

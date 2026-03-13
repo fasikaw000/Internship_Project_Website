@@ -70,7 +70,7 @@ export default function Cart() {
         <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
           <p className="text-xl text-slate-400 font-medium mb-4">Your cart is currently empty.</p>
           <Link to="/products" className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold hover:bg-indigo-700 transition shadow-lg inline-block">
-            Shop Now
+            Start Shopping
           </Link>
         </div>
       ) : (
@@ -97,7 +97,7 @@ export default function Cart() {
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-bold text-slate-900 text-lg">{item.name}</h3>
-                    <p className="font-bold text-indigo-600">{(item.price * item.quantity).toFixed(2)} ETB</p>
+                    <p className="font-bold text-slate-900">{(item.price * item.quantity).toFixed(2)} ETB</p>
                   </div>
                   <p className="text-sm text-slate-500 mb-4 line-clamp-1">{item.description}</p>
 
@@ -118,7 +118,7 @@ export default function Cart() {
           {/* Right Column: Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 sticky top-24">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Order Summary</h3>
+
 
               <div className="space-y-4 mb-6">
 
@@ -128,7 +128,7 @@ export default function Cart() {
                 </div>
                 <div className="border-t border-slate-200 pt-4 flex justify-between items-center">
                   <span className="text-lg font-bold text-slate-900">Total</span>
-                  <span className="text-2xl font-black text-indigo-900">{grandTotal.toFixed(2)} <span className="text-sm font-normal text-slate-500">ETB</span></span>
+                  <span className="text-2xl font-black text-slate-900">{grandTotal.toFixed(2)} <span className="text-sm font-normal text-slate-500">ETB</span></span>
                 </div>
               </div>
 

@@ -206,13 +206,13 @@ export default function Contact() {
                   type="submit"
                   className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-black text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:-translate-y-1"
                 >
-                  Send Message
+                  Submit
                 </button>
               </form>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

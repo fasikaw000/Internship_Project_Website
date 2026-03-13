@@ -316,7 +316,7 @@ export default function ManageProducts() {
                 <div className="min-w-0">
                   <h4 className="font-bold text-slate-800 truncate leading-tight mb-0.5">{p.name}</h4>
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1.5">{p.category} • {p.stock} in stock</p>
-                  <p className="font-black text-indigo-600 text-sm">{p.price?.toFixed(2)} <span className="text-[9px] font-bold text-slate-400">ETB</span></p>
+                  <p className="font-black text-slate-900 text-sm">{p.price?.toFixed(2)} <span className="text-[9px] font-bold text-slate-400">ETB</span></p>
                 </div>
               </div>
               <div className="flex gap-2">

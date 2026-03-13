@@ -1,82 +1,53 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  validateFullName,
-  validateUsername,
-  validateEmail,
-  validatePassword,
-} from "../utils/validation";
+import { validateEmail, validatePassword } from "../utils/validation";
 
-export default function Register() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [notif, setNotif] = useState({ message: "", type: "" }); // { message: string, type: 'success' | 'error' }
+  const [error, setError] = useState("");
 
-  const { register } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
-
-  const showNotification = (message, type = "error") => {
-    setNotif({ message, type });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    if (type === "success") {
-      setTimeout(() => setNotif({ message: "", type: "" }), 5000);
-    }
-  };
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    setNotif({ message: "", type: "" });
-
-    const fullName = `${firstName} ${lastName}`.trim();
-    const errors = [];
-
-    const fullNameErr = validateFullName(fullName);
-    if (fullNameErr) errors.push(fullNameErr);
+    setError("");
 
     const emailErr = validateEmail(email);
-    if (emailErr) errors.push(emailErr);
-
+    if (emailErr) {
+      setError(emailErr);
+      return;
+    }
     const passwordErr = validatePassword(password);
-    if (passwordErr) errors.push(passwordErr);
-
-    if (errors.length > 0) {
-      showNotification(errors[0]); // Show first error for brevity
+    if (passwordErr) {
+      setError(passwordErr);
       return;
     }
 
     setLoading(true);
     try {
-      showNotification(
-        "Welcome to MichuGebeya! Your professional account has been created successfully. Redirecting you to the login portal...",
-        "success"
-      );
-      setTimeout(() => navigate("/login"), 3000);
+      await login({ email, password });
+      navigate("/");
     } catch (err) {
-      showNotification(
-        err.response?.data?.message || "Registration encountered an unexpected issue. Please refine your details and try again.",
-        "error"
-      );
+      setError(err.response?.data?.message || "Log In failed. Please check your credentials.");
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 px-6 lg:px-8 bg-slate-50">
+    <div className="min-h-screen flex flex-col justify-center py-6 px-6 lg:px-8 bg-slate-50 lg:-mt-10">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-extrabold text-slate-900 tracking-tight">
-          Create Account
-        </h2>
+
         <p className="mt-2 text-center text-sm text-slate-600">
-          Already have an account?{" "}
-          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
-            Log In
+          Don't have an account?{" "}
+          <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+            Register
           </Link>
         </p>
       </div>
@@ -84,40 +55,14 @@ export default function Register() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-xl shadow-slate-200/50 rounded-2xl border border-slate-100 sm:px-10">
 
-          {notif.message && (
-            <div className={`mb-6 p-4 rounded-xl border text-sm font-medium flex items-center shadow-sm animate-slideDown ${notif.type === "success"
-              ? "bg-green-50 border-green-100 text-green-700"
-              : "bg-red-50 border-red-100 text-red-700"
-              }`}>
-              <span className="mr-2">{notif.type === "success" ? "✓" : "⚠"}</span>
-              {notif.message}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl text-sm font-medium flex items-center shadow-sm animate-shake">
+              <span className="mr-2">⚠</span>
+              {error}
             </div>
           )}
 
-          <form onSubmit={submitHandler} className="space-y-5">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">First Name</label>
-                <input
-                  type="text"
-                  required
-                  className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Last Name</label>
-                <input
-                  type="text"
-                  required
-                  className="appearance-none block w-full px-4 py-3 border border-slate-200 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              </div>
-            </div>
-
+          <form onSubmit={submitHandler} className="space-y-6">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Email</label>
               <input
@@ -158,6 +103,12 @@ export default function Register() {
               </div>
             </div>
 
+            <div className="flex justify-end">
+              <Link to="/forgot-password" visually="text" className="text-xs font-bold text-indigo-600 hover:text-indigo-500 transition-colors">
+                Forgot Password?
+              </Link>
+            </div>
+
             <div>
               <button
                 type="submit"
@@ -169,7 +120,7 @@ export default function Register() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                ) : "Create Account"}
+                ) : "Log In"}
               </button>
             </div>
           </form>

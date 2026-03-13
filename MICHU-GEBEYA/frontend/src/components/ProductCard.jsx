@@ -21,8 +21,7 @@ export default function ProductCard({ product, onDelete }) {
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
-      navigate("/cart");
-    }, 500);
+    }, 1500); // Keep "Added" state long enough to see
   };
 
   return (
@@ -65,7 +64,7 @@ export default function ProductCard({ product, onDelete }) {
             {product.name}
           </h2>
           <p className="text-2xl font-bold text-slate-900 tracking-tighter">
-            {product.price ? product.price.toLocaleString() : "0"} <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">ETB</span>
+            {product.price ? product.price.toFixed(2) : "0.00"} <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">ETB</span>
           </p>
         </div>
 

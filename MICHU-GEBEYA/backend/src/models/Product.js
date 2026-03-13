@@ -5,7 +5,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     enum: {
-      values: ["electronics", "fashions", "books", "all"],
+      values: ["electronics", "fashions", "books", "mens", "womens", "all"],
       message: "{VALUE} is not a valid category"
     },
     default: "all",

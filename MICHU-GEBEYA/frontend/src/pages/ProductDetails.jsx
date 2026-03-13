@@ -106,8 +106,8 @@ export default function ProductDetails() {
               <h1 className="text-4xl lg:text-5xl font-black text-slate-900 uppercase tracking-tighter italic leading-none mb-6">
                 {product.name}
               </h1>
-              <p className="text-3xl font-black text-indigo-600 italic tracking-tighter">
-                {product.price?.toLocaleString()} <span className="text-sm font-normal text-slate-400 not-italic uppercase tracking-widest ml-2">ETB</span>
+              <p className="text-3xl font-black text-slate-900 italic tracking-tighter">
+                {product.price?.toFixed(2)} <span className="text-sm font-normal text-slate-400 not-italic uppercase tracking-widest ml-2">ETB</span>
               </p>
             </div>
 
